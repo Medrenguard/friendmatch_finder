@@ -1,10 +1,13 @@
 <template>
   <div>
-    <input type="number" v-model="desiredId"/>
-    <button @click="addById">Найти</button>
-    <input type="number" v-model="removableId"/>
-    <button @click="deleteById">Удалить</button>
-    <button @click="build">Построить</button>
+    <div class="managePanel">
+      <input type="number" v-model="desiredId"/>
+      <button @click="addById">Найти</button>
+      <input type="number" v-model="removableId"/>
+      <button @click="deleteById">Удалить</button>
+      <button @click="build">Построить</button>
+    </div>
+
     <div class="column-two">
       <div class="userList">
         <user-card
@@ -126,11 +129,19 @@ export default {
 </script>
 
 <style scoped>
+.managePanel{
+  position: fixed;
+  width: 100%;
+  border: 1px solid;
+  padding: 10px;
+  background: white;
+}
 .column-two {
   display: flex;
   flex-direction: row;
 }
 .column-two > div {
+  margin-top: 40px;
   width: 50%;
 }
 </style>
