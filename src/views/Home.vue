@@ -5,17 +5,27 @@
     <input type="number" v-model="removableId"/>
     <button @click="deleteById">Удалить</button>
     <button @click="build">Построить</button>
-    <div class="cardList">
-      <user-card
-        v-for="user in sortedUsers"
-        :id="user.id"
-        :fullname="user.fullname"
-        :sex="user.sex"
-        :bdate="user.bdate"
-        :photo_url="user.photo_url"
-        :friends_count="user.friends_count"
-         @toggle-user-checkbox="toggleUserCheckbox"
-        :key="user.id"/>
+    <div class="column-two">
+      <div class="userList">
+        <user-card
+          v-for="user in sortedUsers"
+          :id="user.id"
+          :fullname="user.fullname"
+          :sex="user.sex"
+          :bdate="user.bdate"
+          :photo_url="user.photo_url"
+          :friends_count="user.friends_count"
+          @toggle-user-checkbox="toggleUserCheckbox"
+          :key="user.id"/>
+      </div>
+      <div class="friendList">
+        <friend-card
+          v-for="friend in friendsPull"
+          :id="friend.id"
+          :fullname="friend.fullname"
+          :photo_url="friend.photo_url"
+          :key="friend.id"/>
+      </div>
     </div>
   </div>
 </template>
@@ -23,9 +33,10 @@
 <script>
 import axios from 'axios'
 import UserCard from '../components/UserCard.vue'
+import friendCard from '../components/friendCard.vue'
 
 export default {
-  components: { UserCard },
+  components: { UserCard, friendCard },
   name: 'Home',
   data () {
     return {
@@ -61,7 +72,9 @@ export default {
     },
     deleteById () {
       let index = this.users.findIndex(user => user.id === parseInt(this.removableId))
-      return index > -1 ? this.$delete(this.users, index) : console.log('Пользователь дял удаления не найден')
+      let markedIndex = this.markedUsers.indexOf(parseInt(this.removableId))
+      if (index > -1) { this.$delete(this.users, index) } else { console.log('Пользователь для удаления не найден') }
+      if (markedIndex > -1) { this.$delete(this.markedUsers, markedIndex) }
     },
     toggleUserCheckbox (userId) {
       if (!this.markedUsers.includes(userId)) {
@@ -71,17 +84,24 @@ export default {
       }
     },
     build () {
+      this.friendsPull.length = 0
       this.markedUsers.forEach(el => {
         axios.get('https://api.vk.com/method/friends.get?user_id=' + el + '&v=5.131&access_token=' + this.access_token + '&fields=photo_50')
           .then(res => {
             res.data.response.items.forEach(el => {
-              this.friendsPull.push(
-                {
-                  id: el.id,
-                  fullname: el.last_name + ' ' + el.first_name,
-                  photo_url: el.photo_50
-                }
-              )
+              let index = this.friendsPull.findIndex(user => user.id === el.id)
+              if (index === -1) {
+                this.friendsPull.push(
+                  {
+                    id: el.id,
+                    fullname: el.last_name + ' ' + el.first_name,
+                    photo_url: el.photo_50,
+                    match: 1
+                  }
+                )
+              } else {
+                this.friendsPull[index]['match']++
+              }
             })
           }
           )
@@ -106,4 +126,11 @@ export default {
 </script>
 
 <style scoped>
+.column-two {
+  display: flex;
+  flex-direction: row;
+}
+.column-two > div {
+  width: 50%;
+}
 </style>

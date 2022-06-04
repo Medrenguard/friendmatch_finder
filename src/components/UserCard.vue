@@ -70,7 +70,6 @@ export default {
 .user-card {
   border: 1px solid black;
   border-radius: 6px;
-  width: 45%;
   padding: 8px;
   margin-top: 5px;
   background: linear-gradient(to bottom right, #ffdfff, #fefaff);
