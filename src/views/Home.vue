@@ -6,8 +6,11 @@
       <user-card
         v-for="user in users"
         :id="user.id"
-        :first_name="user.first_name"
-        :last_name="user.last_name"
+        :fullname="user.fullname"
+        :sex="user.sex"
+        :bdate="user.bdate"
+        :photo_url="user.photo_url"
+        :friends_count="user.friends_count"
         :key="user.id"/>
     </div>
   </div>
@@ -29,14 +32,17 @@ export default {
   },
   methods: {
     addById () {
-      axios.post('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + this.access_token)
+      axios.post('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + this.access_token + '&fields=sex,photo_50,counters,bdate')
         .then(res => {
-          if (this.users.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
+          if (!res.data.response[0].deactivated && this.users.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
             this.users.push(
               {
                 id: res.data.response[0].id,
-                first_name: res.data.response[0].first_name,
-                last_name: res.data.response[0].last_name
+                fullname: res.data.response[0].first_name + ' ' + res.data.response[0].last_name,
+                sex: res.data.response[0].sex,
+                bdate: res.data.response[0].bdate,
+                photo_url: res.data.response[0].photo_50,
+                friends_count: res.data.response[0].counters['friends']
               }
             )
           }
@@ -46,8 +52,6 @@ export default {
         }
         )
     }
-  },
-  mounted () {
   }
 }
 </script>
