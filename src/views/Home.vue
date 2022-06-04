@@ -27,6 +27,8 @@
             :id="friend.id"
             :fullname="friend.fullname"
             :photo_url="friend.photo_url"
+            :markedCount="markedUsers.length"
+            :matches="friend.match"
             :key="friend.id"/>
         </div>
       </div>
@@ -79,6 +81,7 @@ export default {
       let markedIndex = this.markedUsers.indexOf(parseInt(this.removableId))
       if (index > -1) { this.$delete(this.users, index) } else { console.log('Пользователь для удаления не найден') }
       if (markedIndex > -1) { this.$delete(this.markedUsers, markedIndex) }
+      this.friendsPull.length = 0
     },
     toggleUserCheckbox (userId) {
       if (!this.markedUsers.includes(userId)) {
@@ -86,6 +89,7 @@ export default {
       } else {
         this.$delete(this.markedUsers, this.markedUsers.indexOf(userId))
       }
+      this.friendsPull.length = 0
     },
     build () {
       this.friendsPull.length = 0

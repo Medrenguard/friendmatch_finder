@@ -1,5 +1,5 @@
 <template>
-    <div class="user-card">
+    <div class="user-card" :style="calcColor">
       <div class="user-card__photo">
        <img :src="photo_url" alt="Фото">
       </div>
@@ -21,7 +21,15 @@ export default {
   props: {
     id: Number,
     fullname: String,
-    photo_url: String
+    photo_url: String,
+    markedCount: Number,
+    matches: Number
+  },
+  computed: {
+    calcColor () {
+      let res = this.matches / this.markedCount
+      return 'background: linear-gradient(to bottom right, rgba(255, 0, 246, ' + res + ' ), rgba(0, 0, 0, 0))'
+    }
   }
 }
 </script>
@@ -32,7 +40,7 @@ export default {
   border-radius: 6px;
   padding: 8px;
   margin-top: 5px;
-  background: linear-gradient(to bottom right, #ffdfff, #fefaff);
+  background: linear-gradient(to bottom right, rgba(255, 0, 246, 100), rgba(0, 0, 0, 0));
   display: flex;
   font-size: 11px;
 }
@@ -51,8 +59,5 @@ export default {
 }
 .user-card__main .name {
   font-size: 16px;
-}
-.user-card__id {
-  color: gray;
 }
 </style>
