@@ -7,29 +7,30 @@
       <button @click="deleteById">Удалить</button>
       <button @click="build">Построить</button>
     </div>
-
-    <div class="column-two">
-      <div class="userList">
-        <user-card
-          v-for="user in sortedUsers"
-          :id="user.id"
-          :fullname="user.fullname"
-          :sex="user.sex"
-          :bdate="user.bdate"
-          :photo_url="user.photo_url"
-          :friends_count="user.friends_count"
-          @toggle-user-checkbox="toggleUserCheckbox"
-          :key="user.id"/>
+    <perfect-scrollbar>
+      <div class="column-two">
+        <div class="userList">
+          <user-card
+            v-for="user in sortedUsers"
+            :id="user.id"
+            :fullname="user.fullname"
+            :sex="user.sex"
+            :bdate="user.bdate"
+            :photo_url="user.photo_url"
+            :friends_count="user.friends_count"
+            @toggle-user-checkbox="toggleUserCheckbox"
+            :key="user.id"/>
+        </div>
+        <div class="friendList">
+          <friend-card
+            v-for="friend in friendsPull"
+            :id="friend.id"
+            :fullname="friend.fullname"
+            :photo_url="friend.photo_url"
+            :key="friend.id"/>
+        </div>
       </div>
-      <div class="friendList">
-        <friend-card
-          v-for="friend in friendsPull"
-          :id="friend.id"
-          :fullname="friend.fullname"
-          :photo_url="friend.photo_url"
-          :key="friend.id"/>
-      </div>
-    </div>
+    </perfect-scrollbar>
   </div>
 </template>
 
@@ -135,13 +136,19 @@ export default {
   border: 1px solid;
   padding: 10px;
   background: white;
+  margin-top: -42px;
+  z-index: 1;
+}
+.ps {
+  margin-top: 42px;
+  height: calc(100vh - 42px);
 }
 .column-two {
   display: flex;
   flex-direction: row;
 }
 .column-two > div {
-  margin-top: 40px;
-  width: 50%;
+  width: 48%;
+  margin: 0 0.5%;
 }
 </style>
