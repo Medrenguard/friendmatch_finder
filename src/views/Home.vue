@@ -4,7 +4,7 @@
     <button @click="addById">Найти</button>
     <div class="cardList">
       <user-card
-        v-for="user in users"
+        v-for="user in sortedUsers"
         :id="user.id"
         :fullname="user.fullname"
         :sex="user.sex"
@@ -38,7 +38,7 @@ export default {
             this.users.push(
               {
                 id: res.data.response[0].id,
-                fullname: res.data.response[0].first_name + ' ' + res.data.response[0].last_name,
+                fullname: res.data.response[0].last_name + ' ' + res.data.response[0].first_name,
                 sex: res.data.response[0].sex,
                 bdate: res.data.response[0].bdate,
                 photo_url: res.data.response[0].photo_50,
@@ -51,6 +51,15 @@ export default {
           console.log('Ошибка получения данных: ', error)
         }
         )
+    }
+  },
+  computed: {
+    sortedUsers () {
+      let res = Array.from(this.users)
+      res.sort(function (a, b) {
+        return a.fullname < b.fullname ? -1 : 1
+      })
+      return res
     }
   }
 }
