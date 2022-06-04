@@ -2,6 +2,8 @@
   <div>
     <input type="number" v-model="desiredId"/>
     <button @click="addById">Найти</button>
+    <input type="number" v-model="removableId"/>
+    <button @click="deleteById">Удалить</button>
     <div class="cardList">
       <user-card
         v-for="user in sortedUsers"
@@ -27,6 +29,7 @@ export default {
     return {
       users: [],
       desiredId: 0,
+      removableId: 0,
       access_token: localStorage.access_token
     }
   },
@@ -51,6 +54,10 @@ export default {
           console.log('Ошибка получения данных: ', error)
         }
         )
+    },
+    deleteById () {
+      let index = this.users.findIndex(user => user.id === parseInt(this.removableId))
+      return index > -1 ? this.$delete(this.users, index) : console.log('Пользователь дял удаления не найден')
     }
   },
   computed: {
