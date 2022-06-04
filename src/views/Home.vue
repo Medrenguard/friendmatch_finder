@@ -4,6 +4,7 @@
     <button @click="addById">Найти</button>
     <input type="number" v-model="removableId"/>
     <button @click="deleteById">Удалить</button>
+    <button @click="build">Построить</button>
     <div class="cardList">
       <user-card
         v-for="user in sortedUsers"
@@ -30,6 +31,7 @@ export default {
     return {
       users: [],
       markedUsers: [],
+      friendsPull: [],
       desiredId: 0,
       removableId: 0,
       access_token: localStorage.access_token
@@ -37,7 +39,7 @@ export default {
   },
   methods: {
     addById () {
-      axios.post('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + this.access_token + '&fields=sex,photo_50,counters,bdate')
+      axios.get('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + this.access_token + '&fields=sex,photo_50,counters,bdate')
         .then(res => {
           if (!res.data.response[0].deactivated && this.users.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
             this.users.push(
@@ -67,6 +69,28 @@ export default {
       } else {
         this.$delete(this.markedUsers, this.markedUsers.indexOf(userId))
       }
+    },
+    build () {
+      this.markedUsers.forEach(el => {
+        axios.get('https://api.vk.com/method/friends.get?user_id=' + el + '&v=5.131&access_token=' + this.access_token + '&fields=photo_50')
+          .then(res => {
+            res.data.response.items.forEach(el => {
+              this.friendsPull.push(
+                {
+                  id: el.id,
+                  fullname: el.last_name + ' ' + el.first_name,
+                  photo_url: el.photo_50
+                }
+              )
+            })
+          }
+          )
+          .catch(error => {
+            console.log('Ошибка получения данных: ', error)
+          }
+          )
+      })
+      console.log('build')
     }
   },
   computed: {
