@@ -13,6 +13,7 @@
         :bdate="user.bdate"
         :photo_url="user.photo_url"
         :friends_count="user.friends_count"
+         @toggle-user-checkbox="toggleUserCheckbox"
         :key="user.id"/>
     </div>
   </div>
@@ -28,6 +29,7 @@ export default {
   data () {
     return {
       users: [],
+      markedUsers: [],
       desiredId: 0,
       removableId: 0,
       access_token: localStorage.access_token
@@ -58,6 +60,13 @@ export default {
     deleteById () {
       let index = this.users.findIndex(user => user.id === parseInt(this.removableId))
       return index > -1 ? this.$delete(this.users, index) : console.log('Пользователь дял удаления не найден')
+    },
+    toggleUserCheckbox (userId) {
+      if (!this.markedUsers.includes(userId)) {
+        this.markedUsers.push(userId)
+      } else {
+        this.$delete(this.markedUsers, this.markedUsers.indexOf(userId))
+      }
     }
   },
   computed: {

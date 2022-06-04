@@ -1,5 +1,8 @@
 <template>
     <div class="user-card">
+      <div class="user-card__checkbox">
+        <input type="checkbox" @click="toggleUserCheckbox">
+      </div>
       <div class="user-card__photo">
        <img :src="photo_url" alt="Фото">
       </div>
@@ -54,6 +57,11 @@ export default {
       }
       return 'не указано'
     }
+  },
+  methods: {
+    toggleUserCheckbox () {
+      this.$emit('toggle-user-checkbox', this.id)
+    }
   }
 }
 </script>
@@ -69,10 +77,13 @@ export default {
   display: flex;
   font-size: 11px;
 }
-.user-card__photo {
+.user-card__photo, .user-card__checkbox {
   display: flex;
 }
-.user-card__photo > img {
+.user-card__checkbox {
+  padding-right: 6px;
+}
+.user-card__photo > img, .user-card__checkbox > input {
   align-self: center;
 }
 .user-card__main {
