@@ -1,5 +1,8 @@
 <template>
     <div>
+      <button @click="passToHome">
+        Назад
+      </button>
         hello, {{ this.$store.getters.ID }}!
     </div>
 </template>
@@ -9,8 +12,10 @@
 
 export default {
   name: 'Friend',
-  created () {
-    console.log()
+  methods: {
+    passToHome () {
+      this.$store.dispatch('passToHome')
+    }
   }
 }
 
