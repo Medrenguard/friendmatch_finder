@@ -1,7 +1,7 @@
 <template>
     <div class="user-card">
       <div class="user-card__checkbox">
-        <input type="checkbox" @click="toggleUserCheckbox">
+        <input type="checkbox" @click="toggleUserCheckbox" :checked="isChecked">
       </div>
       <div class="user-card__photo">
        <img :src="photo_url" alt="Фото">
@@ -62,8 +62,15 @@ export default {
     toggleUserCheckbox () {
       this.$emit('toggle-user-checkbox', this.id)
     }
+
+  },
+  computed: {
+    isChecked () {
+      return this.$store.getters.MARKED_USERS.includes(this.id)
+    }
   }
 }
+
 </script>
 
 <style scoped>
