@@ -36,7 +36,7 @@ export const store = new Vuex.Store({
       state.users.push(newValue)
     },
     deleteMarkedUser (state, deletedValue) {
-      state.markedUsers.splice(deletedValue, 1)
+      state.markedUsers.splice(state.markedUsers.indexOf(deletedValue), 1)
     },
     deleteUser (state, deletedValue) {
       state.users.splice(deletedValue, 1)

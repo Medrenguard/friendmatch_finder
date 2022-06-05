@@ -18,7 +18,6 @@
             :bdate="user.bdate"
             :photo_url="user.photo_url"
             :friends_count="user.friends_count"
-            @toggle-user-checkbox="toggleUserCheckbox"
             :key="user.id"/>
         </div>
         <div class="friendList">
@@ -46,13 +45,12 @@ export default {
   data () {
     return {
       desiredId: 0,
-      removableId: 0,
-      access_token: localStorage.access_token
+      removableId: 0
     }
   },
   methods: {
     addById () {
-      axios.get('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + this.access_token + '&fields=sex,photo_50,counters,bdate')
+      axios.get('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + localStorage.access_token + '&fields=sex,photo_50,counters,bdate')
         .then(res => {
           if (!res.data.response[0].deactivated && this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
             this.$store.commit('pushUser',
@@ -77,14 +75,6 @@ export default {
       let markedIndex = this.$store.getters.MARKED_USERS.indexOf(parseInt(this.removableId))
       if (index > -1) { this.$store.commit('deleteUser', index) } else { console.log('Пользователь для удаления не найден') }
       if (markedIndex > -1) { this.$store.commit('deleteMarkedUser', markedIndex) }
-      this.$store.commit('clearFriends')
-    },
-    toggleUserCheckbox (userId) {
-      if (!this.$store.getters.MARKED_USERS.includes(userId)) {
-        this.$store.commit('pushMarkedUser', userId)
-      } else {
-        this.$store.commit('deleteMarkedUser', userId)
-      }
       this.$store.commit('clearFriends')
     },
     build () {

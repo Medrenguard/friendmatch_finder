@@ -60,7 +60,12 @@ export default {
   },
   methods: {
     toggleUserCheckbox () {
-      this.$emit('toggle-user-checkbox', this.id)
+      if (!this.$store.getters.MARKED_USERS.includes(this.id)) {
+        this.$store.commit('pushMarkedUser', this.id)
+      } else {
+        this.$store.commit('deleteMarkedUser', this.id)
+      }
+      this.$store.commit('clearFriends')
     }
 
   },
