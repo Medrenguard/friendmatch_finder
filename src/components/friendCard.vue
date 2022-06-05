@@ -1,5 +1,5 @@
 <template>
-    <div class="user-card" :style="calcColor">
+    <div class="user-card" :style="calcColor" @click="passToProfile">
       <div class="user-card__photo">
        <img :src="photo_url" alt="Фото">
       </div>
@@ -24,6 +24,11 @@ export default {
     photo_url: String,
     markedCount: Number,
     matches: Number
+  },
+  methods: {
+    passToProfile () {
+      this.$store.commit('changeView', 'Friend')
+    }
   },
   computed: {
     calcColor () {

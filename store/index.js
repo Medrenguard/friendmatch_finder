@@ -12,6 +12,10 @@ export const store = new Vuex.Store({
       return state.currentView
     }
   },
-  mutations: {},
+  mutations: {
+    changeView (state, newValue) {
+      state.currentView = newValue
+    }
+  },
   actions: {}
 })

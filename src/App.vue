@@ -11,9 +11,9 @@ import Friend from './views/Friend.vue'
 export default {
   name: 'App',
   components: {Home, Friend},
-  data () {
-    return {
-      currentView: this.$store.getters.CURRENT_VIEW
+  computed: {
+    currentView () {
+      return this.$store.getters.CURRENT_VIEW
     }
   }
 }
