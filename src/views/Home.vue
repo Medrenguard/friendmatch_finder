@@ -27,7 +27,6 @@
             :id="friend.id"
             :fullname="friend.fullname"
             :photo_url="friend.photo_url"
-            :markedCount="markedUsers.length"
             :matches="friend.match"
             :key="friend.id"/>
         </div>
@@ -47,7 +46,6 @@ export default {
   data () {
     return {
       users: [],
-      markedUsers: [],
       friendsPull: [],
       desiredId: 0,
       removableId: 0,
@@ -78,22 +76,22 @@ export default {
     },
     deleteById () {
       let index = this.users.findIndex(user => user.id === parseInt(this.removableId))
-      let markedIndex = this.markedUsers.indexOf(parseInt(this.removableId))
+      let markedIndex = this.$store.getters.MARKED_USERS.indexOf(parseInt(this.removableId))
       if (index > -1) { this.$delete(this.users, index) } else { console.log('Пользователь для удаления не найден') }
-      if (markedIndex > -1) { this.$delete(this.markedUsers, markedIndex) }
+      if (markedIndex > -1) { this.$store.commit('deleteMarkedUser', markedIndex) }
       this.friendsPull.length = 0
     },
     toggleUserCheckbox (userId) {
-      if (!this.markedUsers.includes(userId)) {
-        this.markedUsers.push(userId)
+      if (!this.$store.getters.MARKED_USERS.includes(userId)) {
+        this.$store.commit('pushMarkedUser', userId)
       } else {
-        this.$delete(this.markedUsers, this.markedUsers.indexOf(userId))
+        this.$store.commit('deleteMarkedUser', userId)
       }
       this.friendsPull.length = 0
     },
     build () {
       this.friendsPull.length = 0
-      this.markedUsers.forEach(el => {
+      this.$store.getters.MARKED_USERS.forEach(el => {
         axios.get('https://api.vk.com/method/friends.get?user_id=' + el + '&v=5.131&access_token=' + this.access_token + '&fields=photo_50')
           .then(res => {
             res.data.response.items.forEach(el => {

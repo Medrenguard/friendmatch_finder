@@ -21,9 +21,8 @@ export default {
   props: {
     id: Number,
     fullname: String,
-    photo_url: String,
-    markedCount: Number,
-    matches: Number
+    matches: Number,
+    photo_url: String
   },
   methods: {
     passToProfile (idProfile) {
@@ -32,7 +31,7 @@ export default {
   },
   computed: {
     calcColor () {
-      let res = this.matches / this.markedCount
+      let res = this.matches / this.$store.getters.MARKED_USERS.length
       return 'background: linear-gradient(to bottom right, rgba(255, 0, 246, ' + res + ' ), rgba(0, 0, 0, 0))'
     }
   }

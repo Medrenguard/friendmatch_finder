@@ -5,10 +5,14 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    currentView: 'Home',
-    currentFriendId: 0
+    currentView: 'Friend',
+    currentFriendId: 62765169,
+    markedUsers: []
   },
   getters: {
+    MARKED_USERS: state => {
+      return state.markedUsers
+    },
     CURRENT_VIEW: state => {
       return state.currentView
     },
@@ -17,6 +21,12 @@ export const store = new Vuex.Store({
     }
   },
   mutations: {
+    pushMarkedUser (state, newValue) {
+      state.markedUsers.push(newValue)
+    },
+    deleteMarkedUser (state, newValue) {
+      state.markedUsers.splice(state.markedUsers.indexOf(newValue), 1)
+    },
     changeView (state, newView) {
       state.currentView = newView
     },
