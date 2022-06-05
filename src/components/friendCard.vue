@@ -21,7 +21,6 @@ export default {
   props: {
     id: Number,
     fullname: String,
-    matches: Number,
     photo_url: String
   },
   methods: {
@@ -31,7 +30,7 @@ export default {
   },
   computed: {
     calcColor () {
-      let res = this.matches / this.$store.getters.MARKED_USERS.length
+      let res = this.$store.getters.FRIENDS.find(el => el.id === this.id).matches.length / this.$store.getters.MARKED_USERS.length
       return 'background: linear-gradient(to bottom right, rgba(255, 0, 246, ' + res + ' ), rgba(0, 0, 0, 0))'
     }
   }
@@ -47,6 +46,7 @@ export default {
   background: linear-gradient(to bottom right, rgba(255, 0, 246, 100), rgba(0, 0, 0, 0));
   display: flex;
   font-size: 11px;
+  cursor: pointer;
 }
 .user-card__photo, .user-card__checkbox {
   display: flex;

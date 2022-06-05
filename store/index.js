@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    currentView: 'Friend',
+    currentView: 'Home',
     currentFriendId: 62765169,
     users: [],
     friendsPull: [],
@@ -44,8 +44,8 @@ export const store = new Vuex.Store({
     pushFriend (state, newValue) {
       state.friendsPull.push(newValue)
     },
-    addFriendsMatch (state, index) {
-      state.friendsPull[index]['match']++
+    addFriendsMatch (state, payload) {
+      state.friendsPull[payload.friendIndex]['matches'].push(payload.userId)
     },
     clearFriends (state) {
       state.friendsPull = Array.from([])

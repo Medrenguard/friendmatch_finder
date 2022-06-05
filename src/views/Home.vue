@@ -79,22 +79,22 @@ export default {
     },
     build () {
       this.$store.commit('clearFriends')
-      this.$store.getters.MARKED_USERS.forEach(el => {
-        axios.get('https://api.vk.com/method/friends.get?user_id=' + el + '&v=5.131&access_token=' + this.access_token + '&fields=photo_50')
+      this.$store.getters.MARKED_USERS.forEach(user => {
+        axios.get('https://api.vk.com/method/friends.get?user_id=' + user + '&v=5.131&access_token=' + localStorage.access_token + '&fields=photo_50')
           .then(res => {
-            res.data.response.items.forEach(el => {
-              let index = this.$store.getters.FRIENDS.findIndex(user => user.id === el.id)
+            res.data.response.items.forEach(friend => {
+              let index = this.$store.getters.FRIENDS.findIndex(el => el.id === friend.id)
               if (index === -1) {
                 this.$store.commit('pushFriend',
                   {
-                    id: el.id,
-                    fullname: el.last_name + ' ' + el.first_name,
-                    photo_url: el.photo_50,
-                    match: 1
+                    id: friend.id,
+                    fullname: friend.last_name + ' ' + friend.first_name,
+                    photo_url: friend.photo_50,
+                    matches: [user]
                   }
                 )
               } else {
-                this.$store.commit('addFriendsMatch', index)
+                this.$store.commit('addFriendsMatch', {friendIndex: index, userId: user})
               }
             })
           }
