@@ -5,17 +5,29 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    currentView: 'Home'
+    currentView: 'Home',
+    currentFriendId: 0
   },
   getters: {
     CURRENT_VIEW: state => {
       return state.currentView
+    },
+    ID: state => {
+      return state.currentFriendId
     }
   },
   mutations: {
-    changeView (state, newValue) {
-      state.currentView = newValue
+    changeView (state, newView) {
+      state.currentView = newView
+    },
+    changeFriendId (state, newId) {
+      state.currentFriendId = newId
     }
   },
-  actions: {}
+  actions: {
+    passToProfile (context, payload) {
+      context.commit('changeView', payload.view)
+      context.commit('changeFriendId', payload.id)
+    }
+  }
 })

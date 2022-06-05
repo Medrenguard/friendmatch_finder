@@ -1,6 +1,6 @@
 <template>
     <div>
-        hello, friend!
+        hello, {{ this.$store.getters.ID }}!
     </div>
 </template>
 

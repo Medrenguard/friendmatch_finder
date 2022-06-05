@@ -1,5 +1,5 @@
 <template>
-    <div class="user-card" :style="calcColor" @click="passToProfile">
+    <div class="user-card" :style="calcColor" @click="passToProfile(id)">
       <div class="user-card__photo">
        <img :src="photo_url" alt="Фото">
       </div>
@@ -26,8 +26,8 @@ export default {
     matches: Number
   },
   methods: {
-    passToProfile () {
-      this.$store.commit('changeView', 'Friend')
+    passToProfile (idProfile) {
+      this.$store.dispatch('passToProfile', {view: 'Friend', id: idProfile})
     }
   },
   computed: {
