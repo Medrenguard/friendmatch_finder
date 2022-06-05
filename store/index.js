@@ -35,9 +35,9 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
-    passToProfile (context, payload) {
-      context.commit('changeView', payload.view)
-      context.commit('changeFriendId', payload.id)
+    passToProfile (context, id) {
+      context.commit('changeView', 'Friend')
+      context.commit('changeFriendId', id)
     },
     passToHome (context) {
       context.commit('changeView', 'Home')

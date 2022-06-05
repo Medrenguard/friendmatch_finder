@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     passToProfile (idProfile) {
-      this.$store.dispatch('passToProfile', {view: 'Friend', id: idProfile})
+      this.$store.dispatch('passToProfile', idProfile)
     }
   },
   computed: {
