@@ -7,9 +7,17 @@ export const store = new Vuex.Store({
   state: {
     currentView: 'Friend',
     currentFriendId: 62765169,
+    users: [],
+    friendsPull: [],
     markedUsers: []
   },
   getters: {
+    USERS: state => {
+      return state.users
+    },
+    FRIENDS: state => {
+      return state.friendsPull
+    },
     MARKED_USERS: state => {
       return state.markedUsers
     },
@@ -24,8 +32,23 @@ export const store = new Vuex.Store({
     pushMarkedUser (state, newValue) {
       state.markedUsers.push(newValue)
     },
-    deleteMarkedUser (state, newValue) {
-      state.markedUsers.splice(state.markedUsers.indexOf(newValue), 1)
+    pushUser (state, newValue) {
+      state.users.push(newValue)
+    },
+    deleteMarkedUser (state, deletedValue) {
+      state.markedUsers.splice(state.markedUsers.indexOf(deletedValue), 1)
+    },
+    deleteUser (state, deletedValue) {
+      state.users.splice(deletedValue, 1)
+    },
+    pushFriend (state, newValue) {
+      state.friendsPull.push(newValue)
+    },
+    addFriendsMatch (state, index) {
+      state.friendsPull[index]['match']++
+    },
+    clearFriends (state) {
+      state.friendsPull.length = 0
     },
     changeView (state, newView) {
       state.currentView = newView

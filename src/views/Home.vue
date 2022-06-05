@@ -23,7 +23,7 @@
         </div>
         <div class="friendList">
           <friend-card
-            v-for="friend in friendsPull"
+            v-for="friend in this.$store.getters.FRIENDS"
             :id="friend.id"
             :fullname="friend.fullname"
             :photo_url="friend.photo_url"
@@ -45,8 +45,6 @@ export default {
   name: 'Home',
   data () {
     return {
-      users: [],
-      friendsPull: [],
       desiredId: 0,
       removableId: 0,
       access_token: localStorage.access_token
@@ -56,8 +54,8 @@ export default {
     addById () {
       axios.get('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + this.access_token + '&fields=sex,photo_50,counters,bdate')
         .then(res => {
-          if (!res.data.response[0].deactivated && this.users.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
-            this.users.push(
+          if (!res.data.response[0].deactivated && this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
+            this.$store.commit('pushUser',
               {
                 id: res.data.response[0].id,
                 fullname: res.data.response[0].last_name + ' ' + res.data.response[0].first_name,
@@ -75,11 +73,11 @@ export default {
         )
     },
     deleteById () {
-      let index = this.users.findIndex(user => user.id === parseInt(this.removableId))
+      let index = this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.removableId))
       let markedIndex = this.$store.getters.MARKED_USERS.indexOf(parseInt(this.removableId))
-      if (index > -1) { this.$delete(this.users, index) } else { console.log('Пользователь для удаления не найден') }
+      if (index > -1) { this.$store.commit('deleteUser', index) } else { console.log('Пользователь для удаления не найден') }
       if (markedIndex > -1) { this.$store.commit('deleteMarkedUser', markedIndex) }
-      this.friendsPull.length = 0
+      this.$store.commit('clearFriends')
     },
     toggleUserCheckbox (userId) {
       if (!this.$store.getters.MARKED_USERS.includes(userId)) {
@@ -87,17 +85,17 @@ export default {
       } else {
         this.$store.commit('deleteMarkedUser', userId)
       }
-      this.friendsPull.length = 0
+      this.$store.commit('clearFriends')
     },
     build () {
-      this.friendsPull.length = 0
+      this.$store.commit('clearFriends')
       this.$store.getters.MARKED_USERS.forEach(el => {
         axios.get('https://api.vk.com/method/friends.get?user_id=' + el + '&v=5.131&access_token=' + this.access_token + '&fields=photo_50')
           .then(res => {
             res.data.response.items.forEach(el => {
-              let index = this.friendsPull.findIndex(user => user.id === el.id)
+              let index = this.$store.getters.FRIENDS.findIndex(user => user.id === el.id)
               if (index === -1) {
-                this.friendsPull.push(
+                this.$store.commit('pushFriend',
                   {
                     id: el.id,
                     fullname: el.last_name + ' ' + el.first_name,
@@ -106,7 +104,7 @@ export default {
                   }
                 )
               } else {
-                this.friendsPull[index]['match']++
+                this.$store.commit('addFriendsMatch', index)
               }
             })
           }
@@ -121,7 +119,7 @@ export default {
   },
   computed: {
     sortedUsers () {
-      let res = Array.from(this.users)
+      let res = Array.from(this.$store.getters.USERS)
       res.sort(function (a, b) {
         return a.fullname < b.fullname ? -1 : 1
       })
