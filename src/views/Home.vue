@@ -35,9 +35,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import UserCard from '../components/UserCard.vue'
 import friendCard from '../components/friendCard.vue'
+import { jsonp } from 'vue-jsonp'
 
 export default {
   components: { UserCard, friendCard },
@@ -45,22 +45,29 @@ export default {
   data () {
     return {
       desiredId: 0,
-      removableId: 0
+      removableId: 0,
+      access_token: 'hide for repo'
     }
   },
   methods: {
     addById () {
-      axios.get('https://api.vk.com/method/users.get?user_id=' + this.desiredId + '&v=5.131&access_token=' + localStorage.access_token + '&fields=sex,photo_50,counters,bdate')
+      jsonp('https://api.vk.com/method/users.get',
+        {
+          user_id: this.desiredId,
+          access_token: this.access_token,
+          v: '5.131',
+          fields: 'sex,photo_50,counters,bdate'
+        })
         .then(res => {
-          if (!res.data.response[0].deactivated && this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
+          if (!res.response[0].deactivated && this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
             this.$store.commit('pushUser',
               {
-                id: res.data.response[0].id,
-                fullname: res.data.response[0].last_name + ' ' + res.data.response[0].first_name,
-                sex: res.data.response[0].sex,
-                bdate: res.data.response[0].bdate,
-                photo_url: res.data.response[0].photo_50,
-                friends_count: res.data.response[0].counters['friends']
+                id: res.response[0].id,
+                fullname: res.response[0].last_name + ' ' + res.response[0].first_name,
+                sex: res.response[0].sex,
+                bdate: res.response[0].bdate,
+                photo_url: res.response[0].photo_50,
+                friends_count: res.response[0].counters['friends']
               }
             )
           }
@@ -80,9 +87,15 @@ export default {
     build () {
       this.$store.commit('clearFriends')
       this.$store.getters.MARKED_USERS.forEach(user => {
-        axios.get('https://api.vk.com/method/friends.get?user_id=' + user + '&v=5.131&access_token=' + localStorage.access_token + '&fields=photo_50')
+        jsonp('https://api.vk.com/method/friends.get',
+          {
+            user_id: user,
+            access_token: this.access_token,
+            v: '5.131',
+            fields: 'photo_50'
+          })
           .then(res => {
-            res.data.response.items.forEach(friend => {
+            res.response.items.forEach(friend => {
               let index = this.$store.getters.FRIENDS.findIndex(el => el.id === friend.id)
               if (index === -1) {
                 this.$store.commit('pushFriend',
