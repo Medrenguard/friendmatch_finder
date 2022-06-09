@@ -45,8 +45,7 @@ export default {
   data () {
     return {
       desiredId: 0,
-      removableId: 0,
-      access_token: 'hide for repo'
+      removableId: 0
     }
   },
   methods: {
@@ -54,7 +53,7 @@ export default {
       jsonp('https://api.vk.com/method/users.get',
         {
           user_id: this.desiredId,
-          access_token: this.access_token,
+          access_token: this.$store.getters.TOKEN,
           v: '5.131',
           fields: 'sex,photo_50,counters,bdate'
         })
@@ -90,7 +89,7 @@ export default {
         jsonp('https://api.vk.com/method/friends.get',
           {
             user_id: user,
-            access_token: this.access_token,
+            access_token: this.$store.getters.TOKEN,
             v: '5.131',
             fields: 'photo_50'
           })

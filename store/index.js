@@ -9,9 +9,13 @@ export const store = new Vuex.Store({
     currentFriendId: 62765169,
     users: [],
     friendsPull: [],
-    markedUsers: []
+    markedUsers: [],
+    access_token: 'hide for repo'
   },
   getters: {
+    TOKEN: state => {
+      return state.access_token
+    },
     USERS: state => {
       return state.users
     },
