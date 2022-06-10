@@ -74,9 +74,9 @@ export default {
         access_token: this.$store.getters.TOKEN,
         v: '5.131'
       }).then(res => {
-      if (res.error && res.error.error_code === 30) { console.log('Это приватный профиль') } else { this.posts = res.response.items }
+      if ('error' in res) { throw (res.error.error_msg) } else { this.posts = res.response.items }
     }).catch(error => {
-      console.log(error)
+      console.log('Ошибка при выгрузке данных со стены: ', error)
     })
   }
 }

@@ -58,6 +58,7 @@ export default {
           fields: 'sex,photo_50,counters,bdate'
         })
         .then(res => {
+          if ('error' in res) { throw (res.error.error_msg) }
           if (!res.response[0].deactivated && this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
             this.$store.commit('pushUser',
               {
@@ -72,7 +73,7 @@ export default {
           }
         })
         .catch(error => {
-          console.log('Ошибка получения данных: ', error)
+          console.log('Ошибка при добавлении пользователя: ', error)
         }
         )
     },
@@ -94,6 +95,7 @@ export default {
             fields: 'photo_50'
           })
           .then(res => {
+            if ('error' in res) { throw (res.error.error_msg) }
             res.response.items.forEach(friend => {
               let index = this.$store.getters.FRIENDS.findIndex(el => el.id === friend.id)
               if (index === -1) {
@@ -112,7 +114,7 @@ export default {
           }
           )
           .catch(error => {
-            console.log('Ошибка получения данных: ', error)
+            console.log('Ошибка при построении списка друзей: ', error)
           }
           )
       })
