@@ -2,6 +2,10 @@
 
 > A Vue.js project
 
+## Demo
+Кликни на изображение, чтобы посмотреть демо функционала
+[![demo video](http://img.youtube.com/vi/mlEf1I39lH0/0.jpg)](https://www.youtube.com/watch?v=mlEf1I39lH0)
+
 ## Build Setup
 
 ``` bash
