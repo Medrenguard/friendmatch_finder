@@ -45,11 +45,8 @@ export const store = new Vuex.Store({
     deleteUser (state, deletedValue) {
       state.users.splice(deletedValue, 1)
     },
-    pushFriend (state, newValue) {
-      state.friendsPull.push(newValue)
-    },
-    addFriendsMatch (state, payload) {
-      state.friendsPull[payload.friendIndex]['matches'].push(payload.userId)
+    updateFriends (state, newValue) {
+      state.friendsPull = newValue
     },
     clearFriends (state) {
       state.friendsPull = Array.from([])

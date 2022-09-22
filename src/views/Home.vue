@@ -86,6 +86,8 @@ export default {
     },
     build () {
       this.$store.commit('clearFriends')
+      let friends = []
+      let counter = this.$store.getters.MARKED_USERS.length
       this.$store.getters.MARKED_USERS.forEach(user => {
         jsonp('https://api.vk.com/method/friends.get',
           {
@@ -97,9 +99,9 @@ export default {
           .then(res => {
             if ('error' in res) { throw (res.error.error_msg) }
             res.response.items.forEach(friend => {
-              let index = this.$store.getters.FRIENDS.findIndex(el => el.id === friend.id)
+              let index = friends.findIndex(el => el.id === friend.id)
               if (index === -1) {
-                this.$store.commit('pushFriend',
+                friends.push(
                   {
                     id: friend.id,
                     fullname: friend.last_name + ' ' + friend.first_name,
@@ -108,9 +110,13 @@ export default {
                   }
                 )
               } else {
-                this.$store.commit('addFriendsMatch', {friendIndex: index, userId: user})
+                friends[index]['matches'].push(user)
               }
             })
+            counter--
+            if (counter === 0) {
+              this.$store.commit('updateFriends', friends.filter(el => el.matches.length > 1))
+            }
           }
           )
           .catch(error => {
