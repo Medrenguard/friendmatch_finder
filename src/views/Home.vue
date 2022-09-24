@@ -5,7 +5,7 @@
       <button @click="addById">Найти</button>
       <input type="number" v-model="removableId"/>
       <button @click="deleteById">Удалить</button>
-      <button @click="build">Построить</button>
+      <button @click="build" :disabled="!canStartBuild">Поиск</button>
     </div>
     <perfect-scrollbar>
       <div class="column-two">
@@ -22,10 +22,16 @@
         </div>
         <div class="friendList">
           <div class="info" v-show="!this.$store.getters.FRIENDS.length">
-            <div v-show="!this.$store.getters.LOADING && !this.$store.getters.BUILDCOMPLETED">
+            <div v-show="!addedMoreThanOneUser">
+              Добавьте хотя бы 2 пользователей
+            </div>
+            <div v-show="addedMoreThanOneUser && !canStartBuild">
+              Выберите более 1 пользователя
+            </div>
+            <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
               Произведите поиск
             </div>
-            <div v-show="!this.$store.getters.LOADING && this.$store.getters.BUILDCOMPLETED">
+            <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
               Общие друзья не найдены
             </div>
             <div v-show="this.$store.getters.LOADING">
@@ -144,6 +150,12 @@ export default {
         return a.fullname < b.fullname ? -1 : 1
       })
       return res
+    },
+    addedMoreThanOneUser () {
+      return this.$store.getters.USERS.length > 1
+    },
+    canStartBuild () {
+      return this.$store.getters.MARKED_USERS.length > 1
     }
   }
 }
