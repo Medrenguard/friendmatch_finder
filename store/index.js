@@ -10,6 +10,8 @@ export const store = new Vuex.Store({
     users: [],
     friendsPull: [],
     markedUsers: [],
+    loading: false,
+    buildCompleted: false,
     access_token: 'hide for repo'
   },
   getters: {
@@ -30,6 +32,12 @@ export const store = new Vuex.Store({
     },
     ID: state => {
       return state.currentFriendId
+    },
+    BUILDCOMPLETED: state => {
+      return state.buildCompleted
+    },
+    LOADING: state => {
+      return state.loading
     }
   },
   mutations: {
@@ -45,17 +53,23 @@ export const store = new Vuex.Store({
     deleteUser (state, deletedValue) {
       state.users.splice(deletedValue, 1)
     },
-    updateFriends (state, newValue) {
+    updateFriendsPull (state, newValue) {
       state.friendsPull = newValue
     },
-    clearFriends (state) {
+    clearFriendsPull (state) {
       state.friendsPull = Array.from([])
+    },
+    changeBuildStatus (state, newValue) {
+      state.buildCompleted = newValue
     },
     changeView (state, newView) {
       state.currentView = newView
     },
     changeFriendId (state, newId) {
       state.currentFriendId = newId
+    },
+    changeLoading (state, newValue) {
+      state.loading = newValue
     }
   },
   actions: {
@@ -66,6 +80,20 @@ export const store = new Vuex.Store({
     passToHome (context) {
       context.commit('changeView', 'Home')
       context.commit('changeFriendId', 0)
+    },
+    clearFriends (context) {
+      context.commit('clearFriendsPull')
+      context.commit('changeBuildStatus', false)
+    },
+    startBuild (context) {
+      context.commit('clearFriendsPull')
+      context.commit('changeBuildStatus', false)
+      context.commit('changeLoading', true)
+    },
+    finishBuild (context, newValue) {
+      context.commit('updateFriendsPull', newValue)
+      context.commit('changeBuildStatus', true)
+      context.commit('changeLoading', false)
     }
   }
 })

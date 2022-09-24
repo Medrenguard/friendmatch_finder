@@ -21,6 +21,17 @@
             :key="user.id"/>
         </div>
         <div class="friendList">
+          <div class="info" v-show="!this.$store.getters.FRIENDS.length">
+            <div v-show="!this.$store.getters.LOADING && !this.$store.getters.BUILDCOMPLETED">
+              Произведите поиск
+            </div>
+            <div v-show="!this.$store.getters.LOADING && this.$store.getters.BUILDCOMPLETED">
+              Общие друзья не найдены
+            </div>
+            <div v-show="this.$store.getters.LOADING">
+              Загрузка...
+            </div>
+          </div>
           <friend-card
             v-for="friend in this.$store.getters.FRIENDS"
             :id="friend.id"
@@ -82,10 +93,10 @@ export default {
       let markedIndex = this.$store.getters.MARKED_USERS.indexOf(parseInt(this.removableId))
       if (index > -1) { this.$store.commit('deleteUser', index) } else { console.log('Пользователь для удаления не найден') }
       if (markedIndex > -1) { this.$store.commit('deleteMarkedUser', markedIndex) }
-      this.$store.commit('clearFriends')
+      this.$store.dispatch('clearFriends')
     },
     build () {
-      this.$store.commit('clearFriends')
+      this.$store.dispatch('startBuild')
       let friends = []
       let counter = this.$store.getters.MARKED_USERS.length
       this.$store.getters.MARKED_USERS.forEach(user => {
@@ -115,7 +126,7 @@ export default {
             })
             counter--
             if (counter === 0) {
-              this.$store.commit('updateFriends', friends.filter(el => el.matches.length > 1))
+              this.$store.dispatch('finishBuild', friends.filter(el => el.matches.length > 1))
             }
           }
           )
@@ -159,5 +170,12 @@ export default {
 .column-two > div {
   width: 48%;
   margin: 0 0.5%;
+}
+.info {
+  margin: 9vh auto 1px auto;
+  width: fit-content;
+  color: #9f9f9f;
+  font-weight: 700;
+  font-size: 18px;
 }
 </style>

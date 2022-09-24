@@ -65,7 +65,7 @@ export default {
       } else {
         this.$store.commit('deleteMarkedUser', this.id)
       }
-      this.$store.commit('clearFriends')
+      this.$store.dispatch('clearFriends')
     }
 
   },
