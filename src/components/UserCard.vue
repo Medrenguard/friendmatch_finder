@@ -1,7 +1,7 @@
 <template>
-    <div class="user-card">
+    <div class="user-card" :class=" { disabled: !can_access } ">
       <div class="user-card__checkbox">
-        <input type="checkbox" @click="toggleUserCheckbox" :checked="isChecked">
+        <input type="checkbox" @click="toggleUserCheckbox" :checked="isChecked" :disabled="!can_access">
       </div>
       <div class="user-card__photo">
        <img :src="photo_url" alt="Фото">
@@ -17,7 +17,8 @@
           Возраст: {{ bdate | dateToAge }}
         </div>
         <div>
-          Друзей: {{ friends_count }}
+          <template v-if="can_access">Друзей: {{ friends_count }}</template>
+          <template v-else>Профиль закрыт</template>
         </div>
       </div>
       <div class="user-card__tech">
@@ -39,7 +40,8 @@ export default {
     sex: Number,
     bdate: String,
     photo_url: String,
-    friends_count: Number
+    friends_count: Number,
+    can_access: Boolean
   },
   data () {
     return {
@@ -86,3 +88,11 @@ export default {
 }
 
 </script>
+
+<style scoped>
+
+.user-card.disabled {
+  background: rgb(239,239,239);
+}
+
+</style>

@@ -16,6 +16,7 @@
             :bdate="user.bdate"
             :photo_url="user.photo_url"
             :friends_count="user.friends_count"
+            :can_access="user.can_access"
             :key="user.id"/>
         </div>
         <div class="friendList">
@@ -81,7 +82,8 @@ export default {
                 sex: res.response[0].sex,
                 bdate: res.response[0].bdate,
                 photo_url: res.response[0].photo_50,
-                friends_count: res.response[0].counters['friends']
+                friends_count: res.response[0].counters['friends'],
+                can_access: res.response[0].can_access_closed
               }
             )
           }
