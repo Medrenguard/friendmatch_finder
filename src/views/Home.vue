@@ -3,8 +3,6 @@
     <div class="managePanel">
       <input type="number" v-model="desiredId"/>
       <button @click="addById">Найти</button>
-      <input type="number" v-model="removableId"/>
-      <button @click="deleteById">Удалить</button>
       <button @click="build" :disabled="!canStartBuild">Поиск</button>
     </div>
     <perfect-scrollbar>
@@ -61,8 +59,7 @@ export default {
   name: 'Home',
   data () {
     return {
-      desiredId: 0,
-      removableId: 0
+      desiredId: 0
     }
   },
   methods: {
@@ -93,13 +90,6 @@ export default {
           console.log('Ошибка при добавлении пользователя: ', error)
         }
         )
-    },
-    deleteById () {
-      let index = this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.removableId))
-      let markedIndex = this.$store.getters.MARKED_USERS.indexOf(parseInt(this.removableId))
-      if (index > -1) { this.$store.commit('deleteUser', index) } else { console.log('Пользователь для удаления не найден') }
-      if (markedIndex > -1) { this.$store.commit('deleteMarkedUser', markedIndex) }
-      this.$store.dispatch('clearFriends')
     },
     build () {
       this.$store.dispatch('startBuild')

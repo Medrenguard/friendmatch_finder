@@ -50,8 +50,8 @@ export const store = new Vuex.Store({
     deleteMarkedUser (state, deletedValue) {
       state.markedUsers.splice(state.markedUsers.indexOf(deletedValue), 1)
     },
-    deleteUser (state, deletedValue) {
-      state.users.splice(deletedValue, 1)
+    deleteUser (state, deletedId) {
+      state.users.splice(state.users.findIndex(user => user.id === deletedId), 1)
     },
     updateFriendsPull (state, newValue) {
       state.friendsPull = newValue

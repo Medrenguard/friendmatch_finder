@@ -53,5 +53,24 @@ body {
 }
 .user-card__id {
   color: gray;
+  text-align: end;
 }
+.user-card__tech {
+  min-width: 60px;
+  position: relative;
+}
+.rubbish-img {
+  background-image: url(assets/rubbish.png);
+  background-size: contain;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 38%;
+  left: 38%;
+}
+.rubbish-img:hover {
+  background-image: url(assets/rubbish-hover.png);
+  cursor: pointer;
+}
+
 </style>

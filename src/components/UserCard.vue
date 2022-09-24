@@ -20,8 +20,11 @@
           Друзей: {{ friends_count }}
         </div>
       </div>
-      <div class="user-card__id">
-        {{ id }}
+      <div class="user-card__tech">
+        <div class="user-card__id">
+          {{ id }}
+        </div>
+        <div class="rubbish-img" @click="deleteUser"></div>
       </div>
     </div>
 </template>
@@ -66,8 +69,14 @@ export default {
         this.$store.commit('deleteMarkedUser', this.id)
       }
       this.$store.dispatch('clearFriends')
+    },
+    deleteUser () {
+      if (this.$store.getters.MARKED_USERS.includes(this.id)) {
+        this.$store.commit('deleteMarkedUser', this.id)
+        this.$store.dispatch('clearFriends')
+      }
+      this.$store.commit('deleteUser', this.id)
     }
-
   },
   computed: {
     isChecked () {
