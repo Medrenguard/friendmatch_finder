@@ -3,7 +3,7 @@
     <div class="managePanel">
       <input type="number" v-model="desiredId"/>
       <button @click="addById">Найти</button>
-      <button @click="build" :disabled="!canStartBuild">Поиск</button>
+      <button @click="build" :disabled="!canStartBuild">Построить</button>
     </div>
     <perfect-scrollbar>
       <div class="column-two">
@@ -28,7 +28,7 @@
               Выберите более 1 пользователя
             </div>
             <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
-              Произведите поиск
+              Запустите постройку
             </div>
             <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
               Общие друзья не найдены
