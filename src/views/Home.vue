@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="managePanel">
-      <input type="number" v-model="desiredId"/>
+      <input type="number" v-model="desiredId" :class=" { invalidNumber: desiredId < 1 } " placeholder="Введите ID"/>
       <button @click="addById">Найти</button>
       <button @click="build" :disabled="!canStartBuild">Построить</button>
     </div>
@@ -60,11 +60,12 @@ export default {
   name: 'Home',
   data () {
     return {
-      desiredId: 0
+      desiredId: null
     }
   },
   methods: {
     addById () {
+      if (this.desiredId < 1) { return this.$toast.error(`Указан некорректный ID для поиска`) }
       jsonp('https://api.vk.com/method/users.get',
         {
           user_id: this.desiredId,
@@ -95,8 +96,7 @@ export default {
         .catch(error => {
           this.$toast.error(`Ошибка при добавлении пользователя.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
-        }
-        )
+        })
     },
     build () {
       this.$store.dispatch('startBuild')
@@ -193,5 +193,8 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
   color: #9f9f9f;
   font-weight: 700;
   font-size: 18px;
+}
+.invalidNumber {
+  color: rgb(231, 0, 0);
 }
 </style>
