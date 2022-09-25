@@ -43,5 +43,6 @@ export default {
 }
 .user-card__id {
   color: black;
+  text-align: inherit;
 }
 </style>
