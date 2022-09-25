@@ -75,23 +75,19 @@ export default {
         })
         .then(res => {
           if ('error' in res) { throw (res.error) }
-          if ('deactivated' in res.response[0]) {
-            this.$toast(`Профиль с ID ${this.desiredId} заблокирован или удален.`)
-          } else if (this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
-            this.$store.commit('pushUser',
-              {
-                id: res.response[0].id,
-                fullname: res.response[0].last_name + ' ' + res.response[0].first_name,
-                sex: res.response[0].sex,
-                bdate: res.response[0].bdate,
-                photo_url: res.response[0].photo_50,
-                friends_count: res.response[0].counters['friends'],
-                can_access: res.response[0].can_access_closed
-              }
-            )
-          } else {
-            this.$toast(`Пользователь с ID ${this.desiredId} уже добавлен в список.`)
-          }
+          if ('deactivated' in res.response[0]) { return this.$toast(`Профиль с ID ${this.desiredId} заблокирован или удален.`) }
+          if (this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) !== -1) { return this.$toast(`Пользователь с ID ${this.desiredId} уже добавлен в список.`) }
+          this.$store.commit('pushUser',
+            {
+              id: res.response[0].id,
+              fullname: res.response[0].last_name + ' ' + res.response[0].first_name,
+              sex: res.response[0].sex,
+              bdate: res.response[0].bdate,
+              photo_url: res.response[0].photo_50,
+              friends_count: res.response[0].counters['friends'],
+              can_access: res.response[0].can_access_closed
+            }
+          )
         })
         .catch(error => {
           this.$toast.error(`Ошибка при добавлении пользователя.

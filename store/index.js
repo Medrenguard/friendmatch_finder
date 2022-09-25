@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     currentView: 'Home',
-    currentFriendId: 62765169,
+    currentFriendId: undefined,
     users: [],
     friendsPull: [],
     markedUsers: [],
