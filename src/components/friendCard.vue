@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     calcColor () {
-      let res = this.$store.getters.FRIENDS.find(el => el.id === this.id).matches.length / this.$store.getters.MARKED_USERS.length
+      let res = this.matches.length / this.$store.getters.MARKED_USERS.length
       return 'background: linear-gradient(to bottom right, rgba(255, 0, 246, ' + res + ' ), rgba(0, 0, 0, 0))'
     }
   }
