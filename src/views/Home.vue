@@ -124,7 +124,7 @@ export default {
             })
             counter--
             if (counter === 0) {
-              this.$store.dispatch('finishBuild', friends.filter(el => el.matches.length > 1))
+              this.$store.dispatch('finishBuild', this.processFriends(friends))
             }
           }
           )
@@ -133,6 +133,13 @@ export default {
           }
           )
       })
+    },
+    processFriends (array) {
+      let res = array.filter(el => el.matches.length > 1)
+      res.sort(function (a, b) {
+        return a.matches.length < b.matches.length ? 1 : -1
+      })
+      return res
     }
   },
   computed: {
