@@ -28,16 +28,19 @@
     </div>
   <div>
     <br/>
-      Последние 20 постов пользователя:
-      <div class="posts-wrap">
-        <div
-          v-for="post in posts"
-          class="post"
-          :key="post.id"
-          >
-          {{ post.text | viewOnlyText }}
+      <template v-if="this.private">Стена скрыта</template>
+      <template v-else>
+        Последние 20 постов пользователя:
+        <div class="posts-wrap">
+          <div
+            v-for="post in posts"
+            class="post"
+            :key="post.id"
+            >
+            {{ post.text | viewOnlyText }}
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -61,7 +64,8 @@ export default {
     return {
       friendObject: this.$store.getters.FRIENDS.find(el => el.id === this.$store.getters.ID),
       users: [],
-      posts: []
+      posts: [],
+      private: null
     }
   },
   mounted () {
@@ -74,9 +78,14 @@ export default {
         access_token: this.$store.getters.TOKEN,
         v: '5.131'
       }).then(res => {
-      if ('error' in res) { throw (res.error.error_msg) } else { this.posts = res.response.items }
+      if ('error' in res) {
+        if (res.error.error_code === 30) {
+          this.private = true
+        } else { throw (res.error) }
+      } else { this.posts = res.response.items }
     }).catch(error => {
-      console.log('Ошибка при выгрузке данных со стены: ', error)
+      this.$toast.error(`Ошибка при выгрузке данных со стены:
+ID: ${error.request_params.find(p => p.key === 'owner_id').value} - ${error.error_msg}`)
     })
   }
 }

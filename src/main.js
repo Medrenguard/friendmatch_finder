@@ -7,7 +7,10 @@ import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
 const toastOptions = {
-  // You can set your default options here
+  timeout: 3000,
+  position: 'bottom-center',
+  hideProgressBar: true
+
 }
 
 Vue.use(PerfectScrollbar)

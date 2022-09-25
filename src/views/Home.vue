@@ -73,8 +73,10 @@ export default {
           fields: 'sex,photo_50,counters,bdate'
         })
         .then(res => {
-          if ('error' in res) { throw (res.error.error_msg) }
-          if (!res.response[0].deactivated && this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
+          if ('error' in res) { throw (res.error) }
+          if ('deactivated' in res.response[0]) {
+            this.$toast(`Профиль с ID ${this.desiredId} заблокирован или удален.`)
+          } else if (this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) === -1) {
             this.$store.commit('pushUser',
               {
                 id: res.response[0].id,
@@ -86,10 +88,13 @@ export default {
                 can_access: res.response[0].can_access_closed
               }
             )
+          } else {
+            this.$toast(`Пользователь с ID ${this.desiredId} уже добавлен в список.`)
           }
         })
         .catch(error => {
-          console.log('Ошибка при добавлении пользователя: ', error)
+          this.$toast.error(`Ошибка при добавлении пользователя.
+ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
         }
         )
     },
@@ -106,7 +111,7 @@ export default {
             fields: 'photo_50'
           })
           .then(res => {
-            if ('error' in res) { throw (res.error.error_msg) }
+            if ('error' in res) { throw (res.error) }
             res.response.items.forEach(friend => {
               let index = friends.findIndex(el => el.id === friend.id)
               if (index === -1) {
@@ -129,9 +134,9 @@ export default {
           }
           )
           .catch(error => {
-            console.log('Ошибка при построении списка друзей: ', error)
-          }
-          )
+            this.$toast.error(`Ошибка при построении списка друзей.
+ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
+          })
       })
     },
     processFriends (array) {
