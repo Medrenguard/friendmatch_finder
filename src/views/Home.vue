@@ -21,20 +21,25 @@
         </div>
         <div class="friendList">
           <div class="info" v-show="!this.$store.getters.FRIENDS.length">
-            <div v-show="!addedMoreThanOneUser">
-              Добавьте хотя бы 2 пользователей
+            <div v-show="!this.$store.getters.BROKENBUILD">
+              <div v-show="!addedMoreThanOneUser">
+                Добавьте хотя бы 2 пользователей
+              </div>
+              <div v-show="addedMoreThanOneUser && !canStartBuild">
+                Выберите более 1 пользователя
+              </div>
+              <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
+                Запустите постройку
+              </div>
+              <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
+                Общие друзья не найдены
+              </div>
+              <div v-show="this.$store.getters.LOADING">
+                Загрузка...
+              </div>
             </div>
-            <div v-show="addedMoreThanOneUser && !canStartBuild">
-              Выберите более 1 пользователя
-            </div>
-            <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
-              Запустите постройку
-            </div>
-            <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
-              Общие друзья не найдены
-            </div>
-            <div v-show="this.$store.getters.LOADING">
-              Загрузка...
+            <div v-show="this.$store.getters.BROKENBUILD">
+              Произошла ошибка при построении. Пожалуйста, попробуйте снова
             </div>
           </div>
           <friend-card
@@ -132,6 +137,7 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
           .catch(error => {
             this.$toast.error(`Ошибка при построении списка друзей.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
+            this.$store.dispatch('breakBuild')
           })
       })
     },

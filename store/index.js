@@ -12,6 +12,7 @@ export const store = new Vuex.Store({
     markedUsers: [],
     loading: false,
     buildCompleted: false,
+    brokenBuild: false,
     access_token: 'hide for repo'
   },
   getters: {
@@ -36,6 +37,9 @@ export const store = new Vuex.Store({
     BUILDCOMPLETED: state => {
       return state.buildCompleted
     },
+    BROKENBUILD: state => {
+      return state.brokenBuild
+    },
     LOADING: state => {
       return state.loading
     }
@@ -59,8 +63,11 @@ export const store = new Vuex.Store({
     clearFriendsPull (state) {
       state.friendsPull = Array.from([])
     },
-    changeBuildStatus (state, newValue) {
+    changeBuildCompleted (state, newValue) {
       state.buildCompleted = newValue
+    },
+    changeBuildBroken (state, newValue) {
+      state.brokenBuild = newValue
     },
     changeView (state, newView) {
       state.currentView = newView
@@ -83,16 +90,22 @@ export const store = new Vuex.Store({
     },
     clearFriends (context) {
       context.commit('clearFriendsPull')
-      context.commit('changeBuildStatus', false)
+      context.commit('changeBuildBroken', false)
+      context.commit('changeBuildCompleted', false)
     },
     startBuild (context) {
       context.commit('clearFriendsPull')
-      context.commit('changeBuildStatus', false)
+      context.commit('changeBuildBroken', false)
+      context.commit('changeBuildCompleted', false)
       context.commit('changeLoading', true)
     },
     finishBuild (context, newValue) {
       context.commit('updateFriendsPull', newValue)
-      context.commit('changeBuildStatus', true)
+      context.commit('changeBuildCompleted', true)
+      context.commit('changeLoading', false)
+    },
+    breakBuild (context) {
+      context.commit('changeBuildBroken', true)
       context.commit('changeLoading', false)
     }
   }
