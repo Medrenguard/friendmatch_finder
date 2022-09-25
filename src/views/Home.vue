@@ -42,7 +42,7 @@
             :id="friend.id"
             :fullname="friend.fullname"
             :photo_url="friend.photo_url"
-            :matches="friend.match"
+            :matches="friend.matches"
             :key="friend.id"/>
         </div>
       </div>

@@ -10,6 +10,9 @@
       <div class="user-card__id">
         {{ id }}
       </div>
+      <div>
+        Совпадений: {{ matches.length }}
+      </div>
     </div>
   </div>
 </template>
@@ -21,7 +24,8 @@ export default {
   props: {
     id: Number,
     fullname: String,
-    photo_url: String
+    photo_url: String,
+    matches: Array
   },
   methods: {
     passToProfile (idProfile) {
