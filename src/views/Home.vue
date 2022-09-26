@@ -36,6 +36,8 @@
               </div>
               <div v-show="this.$store.getters.LOADING">
                 Загрузка...
+                <br/>
+                {{ this.$store.getters.MARKED_USERS.length - this.counter }}/{{ this.$store.getters.MARKED_USERS.length }}
               </div>
             </div>
             <div v-show="this.$store.getters.BROKENBUILD">
@@ -65,7 +67,8 @@ export default {
   name: 'Home',
   data () {
     return {
-      desiredId: undefined
+      desiredId: undefined,
+      counter: this.$store.getters.MARKED_USERS.length
     }
   },
   methods: {
@@ -103,43 +106,44 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
     build () {
       this.$store.dispatch('startBuild')
       let friends = []
-      let counter = this.$store.getters.MARKED_USERS.length
-      this.$store.getters.MARKED_USERS.forEach(user => {
-        jsonp('https://api.vk.com/method/friends.get',
-          {
-            user_id: user,
-            access_token: this.$store.getters.TOKEN,
-            v: '5.131',
-            fields: 'photo_50'
-          })
-          .then(res => {
-            if ('error' in res) { throw (res.error) }
-            res.response.items.forEach(friend => {
-              let index = friends.findIndex(el => el.id === friend.id)
-              if (index === -1) {
-                friends.push(
-                  {
-                    id: friend.id,
-                    fullname: friend.last_name + ' ' + friend.first_name,
-                    photo_url: friend.photo_50,
-                    matches: [user]
-                  }
-                )
-              } else {
-                friends[index]['matches'].push(user)
-              }
+      this.counter = this.$store.getters.MARKED_USERS.length
+      this.$store.getters.MARKED_USERS.forEach((user, i) => {
+        setTimeout(() =>
+          jsonp('https://api.vk.com/method/friends.get',
+            {
+              user_id: user,
+              access_token: this.$store.getters.TOKEN,
+              v: '5.131',
+              fields: 'photo_50'
             })
-            counter--
-            if (counter === 0) {
-              this.$store.dispatch('finishBuild', this.processFriends(friends))
+            .then(res => {
+              if ('error' in res) { throw (res.error) }
+              res.response.items.forEach(friend => {
+                let index = friends.findIndex(el => el.id === friend.id)
+                if (index === -1) {
+                  friends.push(
+                    {
+                      id: friend.id,
+                      fullname: friend.last_name + ' ' + friend.first_name,
+                      photo_url: friend.photo_50,
+                      matches: [user]
+                    }
+                  )
+                } else {
+                  friends[index]['matches'].push(user)
+                }
+              })
+              this.counter--
+              if (this.counter === 0) {
+                this.$store.dispatch('finishBuild', this.processFriends(friends))
+              }
             }
-          }
-          )
-          .catch(error => {
-            this.$store.dispatch('breakBuild')
-            this.$toast.error(`Ошибка при построении списка друзей.
+            )
+            .catch(error => {
+              this.$store.dispatch('breakBuild')
+              this.$toast.error(`Ошибка при построении списка друзей.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
-          })
+            }), i * 350)
       })
     },
     processFriends (array) {
