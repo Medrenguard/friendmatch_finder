@@ -136,9 +136,9 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
           }
           )
           .catch(error => {
+            this.$store.dispatch('breakBuild')
             this.$toast.error(`Ошибка при построении списка друзей.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
-            this.$store.dispatch('breakBuild')
           })
       })
     },
