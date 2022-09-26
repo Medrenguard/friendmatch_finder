@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="managePanel">
-      <input type="number" v-model="desiredId" :class=" { invalidNumber: desiredId < 1 } " placeholder="Введите ID"/>
+      <input type="text" v-model="desiredId" placeholder="Введите ID"/>
       <button @click="addById">Найти</button>
       <button @click="build" :disabled="!canStartBuild">Построить</button>
     </div>
@@ -65,12 +65,12 @@ export default {
   name: 'Home',
   data () {
     return {
-      desiredId: null
+      desiredId: undefined
     }
   },
   methods: {
     addById () {
-      if (this.desiredId < 1) { return this.$toast.error(`Указан некорректный ID для поиска`) }
+      if (this.desiredId === undefined) { return this.$toast.error(`Указан некорректный ID для поиска`) }
       jsonp('https://api.vk.com/method/users.get',
         {
           user_id: this.desiredId,
@@ -80,8 +80,9 @@ export default {
         })
         .then(res => {
           if ('error' in res) { throw (res.error) }
+          if (res.response.length === 0) { return this.$toast.error(`Пользователя с ID ${this.desiredId} не существует`) }
           if ('deactivated' in res.response[0]) { return this.$toast(`Профиль с ID ${this.desiredId} заблокирован или удален.`) }
-          if (this.$store.getters.USERS.findIndex(user => user.id === parseInt(this.desiredId)) !== -1) { return this.$toast(`Пользователь с ID ${this.desiredId} уже добавлен в список.`) }
+          if (this.$store.getters.USERS.findIndex(user => user.id === parseInt(res.response[0].id)) !== -1) { return this.$toast(`Пользователь с ID ${this.desiredId} уже добавлен в список.`) }
           this.$store.commit('pushUser',
             {
               id: res.response[0].id,
@@ -195,8 +196,5 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
   color: #9f9f9f;
   font-weight: 700;
   font-size: 18px;
-}
-.invalidNumber {
-  color: rgb(231, 0, 0);
 }
 </style>
