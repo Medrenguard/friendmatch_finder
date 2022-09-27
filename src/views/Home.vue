@@ -68,7 +68,8 @@ export default {
   data () {
     return {
       desiredId: undefined,
-      counter: this.$store.getters.MARKED_USERS.length
+      counter: this.$store.getters.MARKED_USERS.length,
+      friends: []
     }
   },
   methods: {
@@ -105,46 +106,57 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
     },
     build () {
       this.$store.dispatch('startBuild')
-      let friends = []
+      this.friends = []
+      this.counter = this.$store.getters.MARKED_USERS.length
       this.counter = this.$store.getters.MARKED_USERS.length
       this.$store.getters.MARKED_USERS.forEach((user, i) => {
-        setTimeout(() =>
-          jsonp('https://api.vk.com/method/friends.get',
-            {
-              user_id: user,
-              access_token: this.$store.getters.TOKEN,
-              v: '5.131',
-              fields: 'photo_50'
-            })
-            .then(res => {
-              if ('error' in res) { throw (res.error) }
-              res.response.items.forEach(friend => {
-                let index = friends.findIndex(el => el.id === friend.id)
-                if (index === -1) {
-                  friends.push(
-                    {
-                      id: friend.id,
-                      fullname: friend.last_name + ' ' + friend.first_name,
-                      photo_url: friend.photo_50,
-                      matches: [user]
-                    }
-                  )
-                } else {
-                  friends[index]['matches'].push(user)
-                }
-              })
-              this.counter--
-              if (this.counter === 0) {
-                this.$store.dispatch('finishBuild', this.processFriends(friends))
-              }
-            }
-            )
-            .catch(error => {
-              this.$store.dispatch('breakBuild')
-              this.$toast.error(`Ошибка при построении списка друзей.
-ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
-            }), i * 350)
+        // быстрый старт: первые 6 запросов отправляются сразу
+        i < 6 ? this.getFriends(user, 'firstCall') : this.getFriends(user, 'secondCall', i)
       })
+    },
+    getFriends (user, call, order) {
+      // Разрешенное кол-во запросов - 3 в секунду, поэтому delay должен быть 350 в идеале, но если снизить delay и сделать рекурсивный вызов в случае ошибки
+      // Too many requests - это позволит сократить общее время выполнения, особенно для малого кол-во запросов
+      let delay = call === 'firstCall' ? 0 : 100 * order
+      setTimeout(() =>
+        jsonp('https://api.vk.com/method/friends.get',
+          {
+            user_id: user,
+            access_token: this.$store.getters.TOKEN,
+            v: '5.131',
+            fields: 'photo_50'
+          })
+          .then(res => {
+            if ('error' in res) {
+              if (res.error.error_code === 6) { return this.getFriends(user, 'secondCall', 2.5) }
+              throw (res.error)
+            }
+            res.response.items.forEach(friend => {
+              let index = this.friends.findIndex(el => el.id === friend.id)
+              if (index === -1) {
+                this.friends.push(
+                  {
+                    id: friend.id,
+                    fullname: friend.last_name + ' ' + friend.first_name,
+                    photo_url: friend.photo_50,
+                    matches: [user]
+                  }
+                )
+              } else {
+                this.friends[index]['matches'].push(user)
+              }
+            })
+            this.counter--
+            if (this.counter === 0) {
+              this.$store.dispatch('finishBuild', this.processFriends(this.friends))
+            }
+          }
+          )
+          .catch(error => {
+            this.$store.dispatch('breakBuild')
+            this.$toast.error(`Ошибка при построении списка друзей.
+ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
+          }), delay)
     },
     processFriends (array) {
       let res = array.filter(el => el.matches.length > 1)
@@ -154,6 +166,7 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
       return res
     }
   },
+
   computed: {
     sortedUsers () {
       let res = Array.from(this.$store.getters.USERS)
