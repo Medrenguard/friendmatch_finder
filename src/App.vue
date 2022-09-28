@@ -73,4 +73,107 @@ body {
   cursor: pointer;
 }
 
+@media screen and (min-width: 669px) and (max-width: 768px) {
+  .user-card {
+    padding: 6px;
+  }
+  .user-card__checkbox {
+    padding-right: 4px;
+  }
+  .user-card__main {
+    font-size: 1.4vw;
+    padding: 0 7px;
+  }
+  .user-card__main .name {
+    font-size: 2vw;
+  }
+}
+
+@media screen and (min-width: 600px) and (max-width: 669px) {
+  .user-card {
+    padding: 6px;
+  }
+  .user-card__checkbox {
+    padding-right: 4px;
+  }
+  .user-card__main {
+    font-size: 1.5vw;
+    padding: 0 7px;
+  }
+  .user-card__main .name {
+    font-size: 2.2vw;
+  }
+  .user-card__tech {
+    min-width: 10vw;
+  }
+}
+@media screen and (min-width: 481px) and (max-width: 600px) {
+  .user-card {
+    padding: 6px;
+  }
+  .user-card__checkbox {
+    padding-right: 4px;
+  }
+  .user-card__checkbox input {
+    margin: 0
+  }
+  .user-card__main {
+    font-size: 1.5vw;
+    padding: 0 5px;
+  }
+  .user-card__main .name {
+    font-size: 2.2vw;
+  }
+  .user-card__tech {
+    min-width: 10vw;
+  }
+  .user-card__id {
+    font-size: 2vw;
+  }
+}
+@media screen and (max-width: 480px) {
+  .managePanel input {
+    width: 34%;
+  }
+  .user-card {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+  }
+  .user-card__main {
+    order: 0;
+    padding: 0;
+  }
+  .user-card__main .name {
+    margin-bottom: 2px;
+  }
+  .user-card__main .other {
+    position: absolute;
+    left: 62px;
+  }
+  .user-card__photo {
+    order: 1
+  }
+  .user-card__checkbox {
+    order: 2;
+    padding: 6px 15px 4px 15px;
+    width: min-content;
+  }
+  .user-card__tech {
+    order: 4;
+    position: relative;
+  }
+  .userList .user-card__id {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    font-size: 10px;
+  }
+  .rubbish-img {
+    right: 1vw;
+    bottom: 43px;
+    left: auto;
+    top: auto;
+  }
+}
 </style>

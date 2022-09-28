@@ -213,5 +213,11 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
   color: #9f9f9f;
   font-weight: 700;
   font-size: 18px;
+  text-align: center;
+}
+@media screen and (max-width: 480px) {
+  .info {
+    font-size: 4vw;
+  }
 }
 </style>

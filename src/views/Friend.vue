@@ -8,20 +8,22 @@
         Имя друга: {{ friendObject.fullname }}
       </div>
       Добавлен в друзья пользователями:
-      <div
+      <div class="userList">
+        <div
         class="user-card"
         v-for="user in users"
         :key="user.id"
         >
-        <div class="user-card__photo">
-          <img :src="user.photo_url" alt="Фото">
-        </div>
-        <div class="user-card__main">
-          <div class="name">
-            {{ user.fullname }}
+          <div class="user-card__photo">
+            <img :src="user.photo_url" alt="Фото">
           </div>
-          <div class="user-card__id">
-            {{ user.id }}
+          <div class="user-card__main">
+            <div class="name">
+              {{ user.fullname }}
+            </div>
+            <div class="user-card__id">
+              {{ user.id }}
+            </div>
           </div>
         </div>
       </div>
@@ -102,6 +104,7 @@ ID: ${error.request_params.find(p => p.key === 'owner_id').value} - ${error.erro
 .user-card {
   width: 50%;
   cursor: default;
+  position: relative;
 }
 .posts-wrap {
   width: 50%;

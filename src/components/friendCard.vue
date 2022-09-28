@@ -1,17 +1,19 @@
 <template>
-    <div class="user-card" :style="calcColor" @click="passToProfile(id)">
-      <div class="user-card__photo">
-       <img :src="photo_url" alt="Фото">
+  <div class="user-card" :style="calcColor" @click="passToProfile(id)">
+    <div class="user-card__photo">
+      <img :src="photo_url" alt="Фото">
+    </div>
+    <div class="user-card__main">
+      <div class="name">
+        {{ fullname }}
       </div>
-      <div class="user-card__main">
-        <div class="name">
-          {{ fullname }}
+      <div class="other">
+        <div class="user-card__id">
+          {{ id }}
         </div>
-      <div class="user-card__id">
-        {{ id }}
-      </div>
-      <div>
-        Совпадений: {{ matches.length }}
+        <div>
+          Совпадений: {{ matches.length }}
+        </div>
       </div>
     </div>
   </div>
@@ -48,5 +50,8 @@ export default {
 .user-card__id {
   color: black;
   text-align: inherit;
+}
+.user-card__main{
+  position: relative;
 }
 </style>

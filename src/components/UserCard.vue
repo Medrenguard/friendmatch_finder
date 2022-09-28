@@ -10,15 +10,17 @@
         <div class="name">
           {{ fullname }}
         </div>
-        <div>
-          Пол: {{ sex | numToSex }}
-        </div>
-        <div>
-          Возраст: {{ bdate | dateToAge }}
-        </div>
-        <div>
-          <template v-if="can_access">Друзей: {{ friends_count }}</template>
-          <template v-else>Профиль закрыт</template>
+        <div class="other">
+          <div>
+            Пол: {{ sex | numToSex }}
+          </div>
+          <div>
+            Возраст: {{ bdate | dateToAge }}
+          </div>
+          <div>
+            <template v-if="can_access">Друзей: {{ friends_count }}</template>
+            <template v-else>Профиль закрыт</template>
+          </div>
         </div>
       </div>
       <div class="user-card__tech">
@@ -60,7 +62,7 @@ export default {
           return ((new Date().getTime() - new Date(value)) / (24 * 3600 * 365.25 * 1000)) | 0
         }
       }
-      return 'не указано'
+      return '-'
     }
   },
   methods: {
