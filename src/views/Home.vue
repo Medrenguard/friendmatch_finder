@@ -100,8 +100,15 @@ export default {
           )
         })
         .catch(error => {
-          this.$toast.error(`Ошибка при добавлении пользователя.
+          if ('request_params' in error) {
+            this.$toast.error(`Ошибка при добавлении пользователя.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
+          } else if (error.error_code === undefined) {
+            this.$toast.error(`Превышено время ожидания запроса`)
+          } else {
+            this.$toast.error(`Неизвестная ошибка.
+Code: ${error.error_code} - ${error.error_msg}`)
+          }
         })
     },
     build () {
@@ -154,8 +161,15 @@ ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error
           )
           .catch(error => {
             this.$store.dispatch('breakBuild')
-            this.$toast.error(`Ошибка при построении списка друзей.
+            if ('request_params' in error) {
+              this.$toast.error(`Ошибка при построении списка друзей.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
+            } else if (error.error_code === undefined) {
+              this.$toast.error(`Превышено время ожидания запроса`)
+            } else {
+              this.$toast.error(`Неизвестная ошибка.
+Code: ${error.error_code} - ${error.error_msg}`)
+            }
           }), delay)
     },
     processFriends (array) {
