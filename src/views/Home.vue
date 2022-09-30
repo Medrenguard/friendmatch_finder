@@ -132,7 +132,7 @@ Code: ${error.error_code} - ${error.error_msg}`)
             access_token: this.$store.getters.TOKEN,
             v: '5.131',
             fields: 'photo_50'
-          })
+          }, 20000)
           .then(res => {
             if ('error' in res) {
               if (res.error.error_code === 6) { return this.getFriends(user, 'secondCall', 2.5) }
