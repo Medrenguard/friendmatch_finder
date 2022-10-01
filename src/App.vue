@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <component :is="currentView"></component>
+    <Home v-show="currentView === 'Home'"></Home>
+    <Friend v-if="currentView === 'Friend'"></Friend>
   </div>
 </template>
 
