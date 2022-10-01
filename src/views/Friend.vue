@@ -90,7 +90,7 @@ export default {
         this.$toast.error(`Ошибка при выгрузке данных со стены:
 ID: ${error.request_params.find(p => p.key === 'owner_id').value} - ${error.error_msg}`)
       } else if (error.error_code === undefined) {
-        this.$toast.error(`Превышено время ожидания запроса`)
+        this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
       } else {
         this.$toast.error(`Неизвестная ошибка.
 Code: ${error.error_code} - ${error.error_msg}`)

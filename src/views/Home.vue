@@ -104,7 +104,7 @@ export default {
             this.$toast.error(`Ошибка при добавлении пользователя.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
           } else if (error.error_code === undefined) {
-            this.$toast.error(`Превышено время ожидания запроса`)
+            this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
           } else {
             this.$toast.error(`Неизвестная ошибка.
 Code: ${error.error_code} - ${error.error_msg}`)
@@ -165,7 +165,7 @@ Code: ${error.error_code} - ${error.error_msg}`)
               this.$toast.error(`Ошибка при построении списка друзей.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
             } else if (error.error_code === undefined) {
-              this.$toast.error(`Превышено время ожидания запроса`)
+              this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
             } else {
               this.$toast.error(`Неизвестная ошибка.
 Code: ${error.error_code} - ${error.error_msg}`)
