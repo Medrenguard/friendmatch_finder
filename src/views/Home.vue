@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="managePanel">
-      <input type="text" v-model="desiredId" placeholder="Введите ID"/>
+      <input ref="focusInput" type="text" v-model="desiredId" placeholder="Введите ID"/>
       <button @click="addById">Найти</button>
       <button @click="build" :disabled="!canStartBuild">Построить</button>
     </div>
@@ -73,7 +73,11 @@ export default {
     }
   },
   methods: {
+    focusOnInput () {
+      this.$refs.focusInput.focus()
+    },
     addById () {
+      this.focusOnInput()
       if (this.desiredId === undefined) { return this.$toast.error(`Указан некорректный ID для поиска`) }
       jsonp('https://api.vk.com/method/users.get',
         {
@@ -195,6 +199,9 @@ Code: ${error.error_code} - ${error.error_msg}`)
     canStartBuild () {
       return this.$store.getters.MARKED_USERS.length > 1
     }
+  },
+  mounted () {
+    this.focusOnInput()
   }
 }
 </script>
