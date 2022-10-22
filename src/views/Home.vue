@@ -2,8 +2,13 @@
   <div>
     <div class="managePanel">
       <input ref="focusInput" type="text" v-model="desiredId" placeholder="Введите ID"/>
-      <button @click="addById">Найти</button>
-      <button @click="build" :disabled="!canStartBuild">Построить</button>
+      <button @click="addById" :disabled="isEmptyToken">Найти</button>
+      <button @click="build" :disabled="!canStartBuild || isEmptyToken">Построить</button>
+      <template v-if="isEmptyToken">
+        <a :href="href">
+          Войти
+        </a>
+      </template>
     </div>
     <perfect-scrollbar>
       <div class="column-two">
@@ -21,27 +26,32 @@
         </div>
         <div class="friendList">
           <div class="info" v-show="!this.$store.getters.FRIENDS.length">
-            <div v-show="!this.$store.getters.BROKENBUILD">
-              <div v-show="!addedMoreThanOneUser">
-                Добавьте хотя бы 2 пользователей
-              </div>
-              <div v-show="addedMoreThanOneUser && !canStartBuild">
-                Выберите более 1 пользователя
-              </div>
-              <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
-                Запустите постройку
-              </div>
-              <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
-                Общие друзья не найдены
-              </div>
-              <div v-show="this.$store.getters.LOADING">
-                Загрузка...
-                <br/>
-                {{ this.$store.getters.MARKED_USERS.length - this.counter }}/{{ this.$store.getters.MARKED_USERS.length }}
-              </div>
+            <div v-if="isEmptyToken">
+              Пройдите авторизацию
             </div>
-            <div v-show="this.$store.getters.BROKENBUILD">
-              Произошла ошибка при построении. Пожалуйста, попробуйте снова
+            <div v-else>
+              <div v-show="!this.$store.getters.BROKENBUILD">
+                <div v-show="!addedMoreThanOneUser">
+                  Добавьте хотя бы 2 пользователей
+                </div>
+                <div v-show="addedMoreThanOneUser && !canStartBuild">
+                  Выберите более 1 пользователя
+                </div>
+                <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
+                  Запустите постройку
+                </div>
+                <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
+                  Общие друзья не найдены
+                </div>
+                <div v-show="this.$store.getters.LOADING">
+                  Загрузка...
+                  <br/>
+                  {{ this.$store.getters.MARKED_USERS.length - this.counter }}/{{ this.$store.getters.MARKED_USERS.length }}
+                </div>
+              </div>
+              <div v-show="this.$store.getters.BROKENBUILD">
+                Произошла ошибка при построении. Пожалуйста, попробуйте снова
+              </div>
             </div>
           </div>
           <friend-card
@@ -67,12 +77,29 @@ export default {
   name: 'Home',
   data () {
     return {
+      href: 'https://oauth.vk.com/authorize?client_id=51455801&display=page&redirect_uri=' + location.origin + '&scope=friends&response_type=token&v=5.131',
       desiredId: undefined,
       counter: this.$store.getters.MARKED_USERS.length,
       friends: []
     }
   },
   methods: {
+    injectToken () {
+      // Сперва проверяем токен из url - если он есть, то используем его и записываем его в куки на 24 часа
+      let tokenPair = location.hash.substr(1).split('&').find(el => el.indexOf('access_token=') === 0)
+      if (tokenPair !== undefined) {
+        let date = new Date(Date.now() + 86400e3)
+        date = date.toUTCString()
+        document.cookie = `${tokenPair}; expires=` + date
+      } else {
+        // Если токена в url нет - проверяем и используем токен из куков
+        tokenPair = document.cookie.split('; ').find(el => el.indexOf('access_token=') === 0)
+        // Если и там нет токена - прерываем функцию
+        if (tokenPair === undefined) { return 'fail' }
+      }
+      this.$store.commit('injectToken', tokenPair.substr(13))
+      return 'success'
+    },
     focusOnInput () {
       this.$refs.focusInput.focus()
     },
@@ -105,8 +132,14 @@ export default {
         })
         .catch(error => {
           if ('request_params' in error) {
-            this.$toast.error(`Ошибка при добавлении пользователя.
+            if (error.error_code === 5) {
+              this.clearTokens()
+              this.$toast.error(`Ошибка при добавлении пользователя.
+Необходимо произвести вход`, {id: 'AuthError'})
+            } else {
+              this.$toast.error(`Ошибка при добавлении пользователя.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
+            }
           } else if (error.error_code === undefined) {
             this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
           } else {
@@ -166,8 +199,14 @@ Code: ${error.error_code} - ${error.error_msg}`)
           .catch(error => {
             this.$store.dispatch('breakBuild')
             if ('request_params' in error) {
-              this.$toast.error(`Ошибка при построении списка друзей.
+              if (error.error_code === 5) {
+                this.clearTokens()
+                this.$toast.error(`Ошибка при построении списка друзей.
+Необходимо произвести вход`, {id: 'AuthError'})
+              } else {
+                this.$toast.error(`Ошибка при построении списка друзей.
 ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
+              }
             } else if (error.error_code === undefined) {
               this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
             } else {
@@ -182,6 +221,14 @@ Code: ${error.error_code} - ${error.error_msg}`)
         return a.matches.length < b.matches.length ? 1 : -1
       })
       return res
+    },
+    deleteCookie () {
+      document.cookie = `access_token=''; max-age=-1`
+    },
+    clearTokens () {
+      this.deleteCookie()
+      location.hash = ''
+      this.$store.commit('clearToken')
     }
   },
 
@@ -198,10 +245,15 @@ Code: ${error.error_code} - ${error.error_msg}`)
     },
     canStartBuild () {
       return this.$store.getters.MARKED_USERS.length > 1
+    },
+    isEmptyToken () {
+      return this.$store.getters.IS_EMPTY_TOKEN
     }
   },
   mounted () {
-    this.focusOnInput()
+    if (this.injectToken() === 'success') {
+      this.focusOnInput()
+    }
   }
 }
 </script>

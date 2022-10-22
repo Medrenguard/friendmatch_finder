@@ -13,11 +13,14 @@ export const store = new Vuex.Store({
     loading: false,
     buildCompleted: false,
     brokenBuild: false,
-    access_token: 'hide for repo'
+    access_token: undefined
   },
   getters: {
     TOKEN: state => {
       return state.access_token
+    },
+    IS_EMPTY_TOKEN: state => {
+      return state.access_token === undefined
     },
     USERS: state => {
       return state.users
@@ -45,6 +48,12 @@ export const store = new Vuex.Store({
     }
   },
   mutations: {
+    injectToken (state, newValue) {
+      state.access_token = newValue
+    },
+    clearToken (state) {
+      state.access_token = undefined
+    },
     pushMarkedUser (state, newValue) {
       state.markedUsers.push(newValue)
     },
