@@ -85,12 +85,13 @@ export default {
   },
   methods: {
     injectToken () {
-      // Сперва проверяем токен из url - если он есть, то используем его и записываем его в куки на 24 часа
+      // Сперва проверяем токен из url - если он есть, то используем его и записываем его в куки на 24 часа и стираем из url
       let tokenPair = location.hash.substr(1).split('&').find(el => el.indexOf('access_token=') === 0)
       if (tokenPair !== undefined) {
         let date = new Date(Date.now() + 86400e3)
         date = date.toUTCString()
         document.cookie = `${tokenPair}; expires=` + date
+        location.hash = ''
       } else {
         // Если токена в url нет - проверяем и используем токен из куков
         tokenPair = document.cookie.split('; ').find(el => el.indexOf('access_token=') === 0)
