@@ -50,6 +50,7 @@
 
 <script>
 import { jsonp } from 'vue-jsonp'
+import {generateBasicErrors} from '../utils.js'
 
 export default {
   name: 'Friend',
@@ -96,21 +97,11 @@ export default {
           } else { throw (res.error) }
         } else { this.posts = res.response.items }
       }).catch(error => {
-        if ('request_params' in error) {
-          if (error.error_code === 5) {
-            this.clearTokens()
-            this.$toast.error(`Ошибка при выгрузке данных со стены.
-Необходимо произвести вход`, {id: 'AuthError'})
-          } else {
-            this.$toast.error(`Ошибка при выгрузке данных со стены:
-ID: ${error.request_params.find(p => p.key === 'owner_id').value} - ${error.error_msg}`)
-          }
-        } else if (error.error_code === undefined) {
-          this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
-        } else {
-          this.$toast.error(`Неизвестная ошибка.
-Code: ${error.error_code} - ${error.error_msg}`)
+        if ('request_params' in error && error.error_code === 5) {
+          this.clearTokens()
         }
+        let err = generateBasicErrors(error, 'Ошибка при выгрузке данных со стены')
+        this.$toast.error(err.text, err.options)
       })
     }
   }

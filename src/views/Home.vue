@@ -71,6 +71,7 @@
 import UserCard from '../components/UserCard.vue'
 import friendCard from '../components/friendCard.vue'
 import { jsonp } from 'vue-jsonp'
+import {generateBasicErrors} from '../utils.js'
 
 export default {
   components: { UserCard, friendCard },
@@ -132,21 +133,11 @@ export default {
           )
         })
         .catch(error => {
-          if ('request_params' in error) {
-            if (error.error_code === 5) {
-              this.clearTokens()
-              this.$toast.error(`Ошибка при добавлении пользователя.
-Необходимо произвести вход`, {id: 'AuthError'})
-            } else {
-              this.$toast.error(`Ошибка при добавлении пользователя.
-ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
-            }
-          } else if (error.error_code === undefined) {
-            this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
-          } else {
-            this.$toast.error(`Неизвестная ошибка.
-Code: ${error.error_code} - ${error.error_msg}`)
+          if ('request_params' in error && error.error_code === 5) {
+            this.clearTokens()
           }
+          let err = generateBasicErrors(error, 'Ошибка при добавлении пользователя')
+          this.$toast.error(err.text, err.options)
         })
     },
     build () {
@@ -199,21 +190,11 @@ Code: ${error.error_code} - ${error.error_msg}`)
           )
           .catch(error => {
             this.$store.dispatch('breakBuild')
-            if ('request_params' in error) {
-              if (error.error_code === 5) {
-                this.clearTokens()
-                this.$toast.error(`Ошибка при построении списка друзей.
-Необходимо произвести вход`, {id: 'AuthError'})
-              } else {
-                this.$toast.error(`Ошибка при построении списка друзей.
-ID: ${error.request_params.find(p => p.key === 'user_id').value} - ${error.error_msg}`)
-              }
-            } else if (error.error_code === undefined) {
-              this.$toast.error(`Превышено время ожидания запроса`, {id: 'TimeoutError'})
-            } else {
-              this.$toast.error(`Неизвестная ошибка.
-Code: ${error.error_code} - ${error.error_msg}`)
+            if ('request_params' in error && error.error_code === 5) {
+              this.clearTokens()
             }
+            let err = generateBasicErrors(error, 'Ошибка при построении списка друзей')
+            this.$toast.error(err.text, err.options)
           }), delay)
     },
     processFriends (array) {
