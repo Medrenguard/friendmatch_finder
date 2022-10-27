@@ -10,7 +10,6 @@ const toastOptions = {
   timeout: 3000,
   position: 'bottom-center',
   hideProgressBar: true
-
 }
 
 Vue.use(PerfectScrollbar)

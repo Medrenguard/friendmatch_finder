@@ -50,21 +50,14 @@
 
 <script>
 import { jsonp } from 'vue-jsonp'
-import {generateBasicErrors} from '../utils.js'
+import postRequestFunctionsMixin from '../mixins/postRequestFunctionsMixin.js'
 
 export default {
   name: 'Friend',
+  mixins: [postRequestFunctionsMixin],
   methods: {
     passToHome () {
       this.$store.dispatch('passToHome')
-    },
-    deleteCookie () {
-      document.cookie = `access_token=''; max-age=-1`
-    },
-    clearTokens () {
-      this.deleteCookie()
-      location.hash = ''
-      this.$store.commit('clearToken')
     }
   },
   filters: {
@@ -97,11 +90,7 @@ export default {
           } else { throw (res.error) }
         } else { this.posts = res.response.items }
       }).catch(error => {
-        if ('request_params' in error && error.error_code === 5) {
-          this.clearTokens()
-        }
-        let err = generateBasicErrors(error, 'Ошибка при выгрузке данных со стены')
-        this.$toast.error(err.text, err.options)
+        this.processBasicErrors(error, 'Ошибка при выгрузке данных со стены')
       })
     }
   }

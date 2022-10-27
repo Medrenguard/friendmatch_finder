@@ -71,11 +71,12 @@
 import UserCard from '../components/UserCard.vue'
 import friendCard from '../components/friendCard.vue'
 import { jsonp } from 'vue-jsonp'
-import {generateBasicErrors} from '../utils.js'
+import postRequestFunctionsMixin from '../mixins/postRequestFunctionsMixin.js'
 
 export default {
   components: { UserCard, friendCard },
   name: 'Home',
+  mixins: [postRequestFunctionsMixin],
   data () {
     return {
       href: 'https://oauth.vk.com/authorize?client_id=51455801&display=page&redirect_uri=' + location.origin + '&scope=friends&response_type=token&v=5.131',
@@ -133,11 +134,7 @@ export default {
           )
         })
         .catch(error => {
-          if ('request_params' in error && error.error_code === 5) {
-            this.clearTokens()
-          }
-          let err = generateBasicErrors(error, 'Ошибка при добавлении пользователя')
-          this.$toast.error(err.text, err.options)
+          this.processBasicErrors(error, 'Ошибка при добавлении пользователя')
         })
     },
     build () {
@@ -190,11 +187,7 @@ export default {
           )
           .catch(error => {
             this.$store.dispatch('breakBuild')
-            if ('request_params' in error && error.error_code === 5) {
-              this.clearTokens()
-            }
-            let err = generateBasicErrors(error, 'Ошибка при построении списка друзей')
-            this.$toast.error(err.text, err.options)
+            this.processBasicErrors(error, 'Ошибка при построении списка друзей')
           }), delay)
     },
     processFriends (array) {
@@ -203,14 +196,6 @@ export default {
         return a.matches.length < b.matches.length ? 1 : -1
       })
       return res
-    },
-    deleteCookie () {
-      document.cookie = `access_token=''; max-age=-1`
-    },
-    clearTokens () {
-      this.deleteCookie()
-      location.hash = ''
-      this.$store.commit('clearToken')
     }
   },
 
