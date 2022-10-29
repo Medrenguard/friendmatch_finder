@@ -31,6 +31,7 @@
   <div>
     <br/>
       <template v-if="this.private">Стена скрыта</template>
+      <template v-else-if="this.banned">Пользовател заблокирован, стена недоступна</template>
       <template v-else-if="this.$store.getters.IS_EMPTY_TOKEN">Необходимо произвести вход</template>
       <template v-else>
         Последние 20 постов пользователя:
@@ -70,7 +71,8 @@ export default {
       friendObject: this.$store.getters.FRIENDS.find(el => el.id === this.$store.getters.ID),
       users: [],
       posts: [],
-      private: null
+      private: null,
+      banned: null
     }
   },
   mounted () {
@@ -87,6 +89,8 @@ export default {
         if ('error' in res) {
           if (res.error.error_code === 30) {
             this.private = true
+          } else if (res.error.error_code === 18) {
+            this.banned = true
           } else { throw (res.error) }
         } else { this.posts = res.response.items }
       }).catch(error => {
