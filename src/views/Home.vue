@@ -2,9 +2,9 @@
   <div>
     <div class="managePanel">
       <input ref="focusInput" type="text" v-model="desiredId" placeholder="Введите ID"/>
-      <button @click="addById" :disabled="isEmptyToken">Найти</button>
-      <button @click="build" :disabled="!canStartBuild || isEmptyToken">Построить</button>
-      <template v-if="isEmptyToken">
+      <button @click="addById" :disabled="IS_EMPTY_TOKEN">Найти</button>
+      <button @click="build" :disabled="!canStartBuild || IS_EMPTY_TOKEN">Построить</button>
+      <template v-if="IS_EMPTY_TOKEN">
         <a :href="href">
           Войти
         </a>
@@ -25,37 +25,37 @@
             :key="user.id"/>
         </div>
         <div class="friendList">
-          <div class="info" v-show="!this.$store.getters.FRIENDS.length">
-            <div v-if="isEmptyToken">
+          <div class="info" v-show="!this.friendsPull.length">
+            <div v-if="IS_EMPTY_TOKEN">
               Пройдите авторизацию
             </div>
             <div v-else>
-              <div v-show="!this.$store.getters.BROKENBUILD">
+              <div v-show="!this.brokenBuild">
                 <div v-show="!addedMoreThanOneUser">
                   Добавьте хотя бы 2 пользователей
                 </div>
                 <div v-show="addedMoreThanOneUser && !canStartBuild">
                   Выберите более 1 пользователя
                 </div>
-                <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
+                <div v-show="!this.loading && canStartBuild && !this.buildCompleted">
                   Запустите постройку
                 </div>
-                <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
+                <div v-show="!this.loading && canStartBuild && this.buildCompleted">
                   Общие друзья не найдены
                 </div>
-                <div v-show="this.$store.getters.LOADING">
+                <div v-show="this.loading">
                   Загрузка...
                   <br/>
-                  {{ this.$store.getters.MARKED_USERS.length - this.counter }}/{{ this.$store.getters.MARKED_USERS.length }}
+                  {{ this.MARKED_USERS_COUNT - this.counter }}/{{ this.MARKED_USERS_COUNT }}
                 </div>
               </div>
-              <div v-show="this.$store.getters.BROKENBUILD">
+              <div v-show="this.brokenBuild">
                 Произошла ошибка при построении. Пожалуйста, попробуйте снова
               </div>
             </div>
           </div>
           <friend-card
-            v-for="friend in this.$store.getters.FRIENDS"
+            v-for="friend in this.friendsPull"
             :id="friend.id"
             :fullname="friend.fullname"
             :photo_url="friend.photo_url"
@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 import UserCard from '../components/UserCard.vue'
 import friendCard from '../components/friendCard.vue'
 import { jsonp } from 'vue-jsonp'
@@ -81,7 +82,7 @@ export default {
     return {
       href: 'https://oauth.vk.com/authorize?client_id=51455801&display=page&redirect_uri=' + location.origin + '&scope=friends&response_type=token&v=5.131',
       desiredId: undefined,
-      counter: this.$store.getters.MARKED_USERS.length,
+      counter: this.MARKED_USERS_COUNT,
       friends: []
     }
   },
@@ -112,7 +113,7 @@ export default {
       jsonp('https://api.vk.com/method/users.get',
         {
           user_id: this.desiredId,
-          access_token: this.$store.getters.TOKEN,
+          access_token: this.access_token,
           v: '5.131',
           fields: 'sex,photo_50,counters,bdate'
         })
@@ -120,7 +121,7 @@ export default {
           if ('error' in res) { throw (res.error) }
           if (res.response.length === 0) { return this.$toast.error(`Пользователя с ID ${this.desiredId} не существует`) }
           if ('deactivated' in res.response[0]) { return this.$toast(`Профиль с ID ${this.desiredId} заблокирован или удален.`) }
-          if (this.$store.getters.USERS.findIndex(user => user.id === parseInt(res.response[0].id)) !== -1) { return this.$toast(`Пользователь с ID ${this.desiredId} уже добавлен в список.`) }
+          if (this.users.findIndex(user => user.id === parseInt(res.response[0].id)) !== -1) { return this.$toast(`Пользователь с ID ${this.desiredId} уже добавлен в список.`) }
           this.$store.commit('pushUser',
             {
               id: res.response[0].id,
@@ -140,9 +141,8 @@ export default {
     build () {
       this.$store.dispatch('startBuild')
       this.friends = []
-      this.counter = this.$store.getters.MARKED_USERS.length
-      this.counter = this.$store.getters.MARKED_USERS.length
-      this.$store.getters.MARKED_USERS.forEach((user, i) => {
+      this.counter = this.MARKED_USERS_COUNT
+      this.markedUsers.forEach((user, i) => {
         // быстрый старт: первые 6 запросов отправляются сразу
         i < 6 ? this.getFriends(user, 'firstCall') : this.getFriends(user, 'secondCall', i)
       })
@@ -155,7 +155,7 @@ export default {
         jsonp('https://api.vk.com/method/friends.get',
           {
             user_id: user,
-            access_token: this.$store.getters.TOKEN,
+            access_token: this.access_token,
             v: '5.131',
             fields: 'photo_50'
           }, 20000)
@@ -200,21 +200,31 @@ export default {
   },
 
   computed: {
+    ...mapState([
+      'users',
+      'markedUsers',
+      'friendsPull',
+      'loading',
+      'buildCompleted',
+      'brokenBuild',
+      'access_token'
+    ]),
+    ...mapGetters([
+      'MARKED_USERS_COUNT',
+      'IS_EMPTY_TOKEN'
+    ]),
     sortedUsers () {
-      let res = Array.from(this.$store.getters.USERS)
+      let res = Array.from(this.users)
       res.sort(function (a, b) {
         return a.fullname < b.fullname ? -1 : 1
       })
       return res
     },
     addedMoreThanOneUser () {
-      return this.$store.getters.USERS.length > 1
+      return this.users.length > 1
     },
     canStartBuild () {
-      return this.$store.getters.MARKED_USERS.length > 1
-    },
-    isEmptyToken () {
-      return this.$store.getters.IS_EMPTY_TOKEN
+      return this.MARKED_USERS_COUNT > 1
     }
   },
   mounted () {

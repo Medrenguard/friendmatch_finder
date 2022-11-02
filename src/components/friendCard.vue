@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'friendCard',
@@ -35,8 +36,11 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'MARKED_USERS_COUNT'
+    ]),
     calcColor () {
-      let res = this.matches.length / this.$store.getters.MARKED_USERS.length
+      let res = this.matches.length / this.MARKED_USERS_COUNT
       return 'background: linear-gradient(to bottom right, rgba(255, 0, 246, ' + res + ' ), rgba(0, 0, 0, 0))'
     }
   }

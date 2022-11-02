@@ -16,35 +16,11 @@ export const store = new Vuex.Store({
     access_token: undefined
   },
   getters: {
-    TOKEN: state => {
-      return state.access_token
-    },
     IS_EMPTY_TOKEN: state => {
       return state.access_token === undefined
     },
-    USERS: state => {
-      return state.users
-    },
-    FRIENDS: state => {
-      return state.friendsPull
-    },
-    MARKED_USERS: state => {
-      return state.markedUsers
-    },
-    CURRENT_VIEW: state => {
-      return state.currentView
-    },
-    ID: state => {
-      return state.currentFriendId
-    },
-    BUILDCOMPLETED: state => {
-      return state.buildCompleted
-    },
-    BROKENBUILD: state => {
-      return state.brokenBuild
-    },
-    LOADING: state => {
-      return state.loading
+    MARKED_USERS_COUNT: state => {
+      return state.markedUsers.length
     }
   },
   mutations: {
@@ -95,7 +71,7 @@ export const store = new Vuex.Store({
     },
     passToHome (context) {
       context.commit('changeView', 'Home')
-      context.commit('changeFriendId', 0)
+      context.commit('changeFriendId', undefined)
     },
     clearFriends (context) {
       context.commit('clearFriendsPull')

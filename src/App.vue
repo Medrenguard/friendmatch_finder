@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Home from './views/Home.vue'
 import Friend from './views/Friend.vue'
 
@@ -13,9 +14,9 @@ export default {
   name: 'App',
   components: {Home, Friend},
   computed: {
-    currentView () {
-      return this.$store.getters.CURRENT_VIEW
-    }
+    ...mapState([
+      'currentView'
+    ])
   }
 }
 </script>

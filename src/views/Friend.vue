@@ -11,7 +11,7 @@
       <div class="userList">
         <div
         class="user-card"
-        v-for="user in users"
+        v-for="user in userMatches"
         :key="user.id"
         >
           <div class="user-card__photo">
@@ -28,11 +28,11 @@
         </div>
       </div>
     </div>
-  <div>
+    <div>
     <br/>
       <template v-if="this.private">Стена скрыта</template>
       <template v-else-if="this.banned">Пользовател заблокирован, стена недоступна</template>
-      <template v-else-if="this.$store.getters.IS_EMPTY_TOKEN">Необходимо произвести вход</template>
+      <template v-else-if="this.IS_EMPTY_TOKEN">Необходимо произвести вход</template>
       <template v-else>
         Последние 20 постов пользователя:
         <div class="posts-wrap">
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 import { jsonp } from 'vue-jsonp'
 import postRequestFunctionsMixin from '../mixins/postRequestFunctionsMixin.js'
 
@@ -68,22 +69,32 @@ export default {
   },
   data () {
     return {
-      friendObject: this.$store.getters.FRIENDS.find(el => el.id === this.$store.getters.ID),
-      users: [],
+      // $store.state - костыль. Если использовать mapState/Getters для получения friendObject в data - то это значение не успеет вычислиться до фактической загрузки страницы, для исправления потребуется дополнительная логика
+      friendObject: this.$store.state.friendsPull.find(el => el.id === this.$store.state.currentFriendId),
+      userMatches: [],
       posts: [],
       private: null,
       banned: null
     }
   },
+  computed: {
+    ...mapState([
+      'users',
+      'access_token'
+    ]),
+    ...mapGetters([
+      'IS_EMPTY_TOKEN'
+    ])
+  },
   mounted () {
     this.friendObject.matches.forEach(idOfUser => {
-      this.users.push(this.$store.getters.USERS.find(el => el.id === idOfUser))
+      this.userMatches.push(this.users.find(el => el.id === idOfUser))
     })
-    if (!this.$store.getters.IS_EMPTY_TOKEN) {
+    if (!this.IS_EMPTY_TOKEN) {
       jsonp('https://api.vk.com/method/wall.get',
         {
-          owner_id: this.$store.getters.ID,
-          access_token: this.$store.getters.TOKEN,
+          owner_id: this.$store.state.currentFriendId,
+          access_token: this.access_token,
           v: '5.131'
         }).then(res => {
         if ('error' in res) {

@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: 'UserCard',
@@ -67,7 +68,7 @@ export default {
   },
   methods: {
     toggleUserCheckbox () {
-      if (!this.$store.getters.MARKED_USERS.includes(this.id)) {
+      if (!this.markedUsers.includes(this.id)) {
         this.$store.commit('pushMarkedUser', this.id)
       } else {
         this.$store.commit('deleteMarkedUser', this.id)
@@ -75,7 +76,7 @@ export default {
       this.$store.dispatch('clearFriends')
     },
     deleteUser () {
-      if (this.$store.getters.MARKED_USERS.includes(this.id)) {
+      if (this.markedUsers.includes(this.id)) {
         this.$store.commit('deleteMarkedUser', this.id)
         this.$store.dispatch('clearFriends')
       }
@@ -83,8 +84,11 @@ export default {
     }
   },
   computed: {
+    ...mapState([
+      'markedUsers'
+    ]),
     isChecked () {
-      return this.$store.getters.MARKED_USERS.includes(this.id)
+      return this.markedUsers.includes(this.id)
     }
   }
 }
