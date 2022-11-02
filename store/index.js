@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    currentUser: undefined,
     currentView: 'Home',
     currentFriendId: undefined,
     users: [],
@@ -18,6 +19,9 @@ export const store = new Vuex.Store({
   getters: {
     TOKEN: state => {
       return state.access_token
+    },
+    USER: state => {
+      return state.currentUser
     },
     IS_EMPTY_TOKEN: state => {
       return state.access_token === undefined
@@ -50,6 +54,9 @@ export const store = new Vuex.Store({
   mutations: {
     injectToken (state, newValue) {
       state.access_token = newValue
+    },
+    injectUser (state, newValue) {
+      state.currentUser = newValue
     },
     clearToken (state) {
       state.access_token = undefined

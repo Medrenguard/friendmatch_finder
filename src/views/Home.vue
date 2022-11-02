@@ -4,11 +4,16 @@
       <input ref="focusInput" type="text" v-model="desiredId" placeholder="Введите ID"/>
       <button @click="addById" :disabled="isEmptyToken">Найти</button>
       <button @click="build" :disabled="!canStartBuild || isEmptyToken">Построить</button>
-      <template v-if="isEmptyToken">
-        <a :href="href">
-          Войти
-        </a>
-      </template>
+      <div class="managePanel__other-container">
+        <template v-if="isEmptyToken">
+          <a :href="href">
+            Войти
+          </a>
+        </template>
+        <template v-else>
+          <img class="avatar" :src="this.$store.getters.USER.photo_url">
+        </template>
+      </div>
     </div>
     <perfect-scrollbar>
       <div class="column-two">
@@ -105,6 +110,27 @@ export default {
     },
     focusOnInput () {
       this.$refs.focusInput.focus()
+    },
+    getAccountInfo () {
+      jsonp('https://api.vk.com/method/users.get',
+        {
+          access_token: this.$store.getters.TOKEN,
+          v: '5.131',
+          fields: 'photo_50'
+        })
+        .then(res => {
+          if ('error' in res) { throw (res.error) }
+          this.$store.commit('injectUser',
+            {
+              // id: res.response[0].id,
+              // name: res.response[0].first_name,
+              photo_url: res.response[0].photo_50
+            }
+          )
+        })
+        .catch(error => {
+          this.processBasicErrors(error, 'Ошибка при авторизации')
+        })
     },
     addById () {
       this.focusOnInput()
@@ -219,6 +245,7 @@ export default {
   },
   mounted () {
     if (this.injectToken() === 'success') {
+      this.getAccountInfo()
       this.focusOnInput()
     }
   }
@@ -228,12 +255,25 @@ export default {
 <style scoped>
 .managePanel{
   position: fixed;
-  width: 100%;
+  width: calc(100% + 2px);
+  height: 43px;
+  box-sizing: border-box;
   border: 1px solid;
-  padding: 10px;
+  padding: 0 6px;
   background: white;
-  margin-top: -42px;
+  margin: -42px -1px 0;
   z-index: 1;
+  display: flex;
+}
+.managePanel > :nth-child(n) {
+  margin-left: 4px;
+  align-self: center;
+}
+.managePanel__other-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row-reverse;
+  padding-right: 4px;
 }
 .ps {
   margin-top: 42px;
@@ -254,6 +294,11 @@ export default {
   font-weight: 700;
   font-size: 18px;
   text-align: center;
+}
+.avatar {
+  height: 29px;
+  border-radius: 15px;
+  margin: 0 2px;
 }
 @media screen and (max-width: 480px) {
   .info {
