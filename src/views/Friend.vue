@@ -69,8 +69,7 @@ export default {
   },
   data () {
     return {
-      // $store.state - костыль. Если использовать mapState/Getters для получения friendObject в data - то это значение не успеет вычислиться до фактической загрузки страницы, для исправления потребуется дополнительная логика
-      friendObject: this.$store.state.friendsPull.find(el => el.id === this.$store.state.currentFriendId),
+      friendObject: {},
       userMatches: [],
       posts: [],
       private: null,
@@ -80,6 +79,8 @@ export default {
   computed: {
     ...mapState([
       'users',
+      'friendsPull',
+      'currentFriendId',
       'access_token'
     ]),
     ...mapGetters([
@@ -87,13 +88,14 @@ export default {
     ])
   },
   mounted () {
+    this.friendObject = this.friendsPull.find(el => el.id === this.currentFriendId)
     this.friendObject.matches.forEach(idOfUser => {
       this.userMatches.push(this.users.find(el => el.id === idOfUser))
     })
     if (!this.IS_EMPTY_TOKEN) {
       jsonp('https://api.vk.com/method/wall.get',
         {
-          owner_id: this.$store.state.currentFriendId,
+          owner_id: this.currentFriendId,
           access_token: this.access_token,
           v: '5.131'
         }).then(res => {
