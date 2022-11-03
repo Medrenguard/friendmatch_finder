@@ -5,14 +5,17 @@
       <button @click="addById" :disabled="isEmptyToken">Найти</button>
       <button @click="build" :disabled="!canStartBuild || isEmptyToken">Построить</button>
       <div class="managePanel__other-container">
-        <template v-if="isEmptyToken">
-          <a :href="href">
-            Войти
-          </a>
-        </template>
-        <template v-else>
-          <img class="avatar" :src="this.$store.getters.USER.photo_url">
-        </template>
+        <img v-show="loadingProfile" class="preloader" src="../assets/loading.svg">
+        <div v-show="!loadingProfile" style="display: inherit">
+          <template v-if="isEmptyToken">
+            <a :href="href">
+              Войти
+            </a>
+          </template>
+          <template v-else>
+            <img class="avatar" :src="this.$store.getters.USER.photo_url">
+          </template>
+        </div>
       </div>
     </div>
     <perfect-scrollbar>
@@ -31,27 +34,32 @@
         </div>
         <div class="friendList">
           <div class="info" v-show="!this.$store.getters.FRIENDS.length">
-            <div v-if="isEmptyToken">
-              Пройдите авторизацию
+            <div v-show="loadingProfile">
+              <img class="preloader" src="../assets/loading.svg">
             </div>
-            <div v-else>
-              <div v-show="!this.$store.getters.BROKENBUILD">
-                <div v-show="!addedMoreThanOneUser">
-                  Добавьте хотя бы 2 пользователей
-                </div>
-                <div v-show="addedMoreThanOneUser && !canStartBuild">
-                  Выберите более 1 пользователя
-                </div>
-                <div v-show="!this.$store.getters.LOADING && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
-                  Запустите постройку
-                </div>
-                <div v-show="!this.$store.getters.LOADING && canStartBuild && this.$store.getters.BUILDCOMPLETED">
-                  Общие друзья не найдены
-                </div>
-                <div v-show="this.$store.getters.LOADING">
-                  Загрузка...
-                  <br/>
-                  {{ this.$store.getters.MARKED_USERS.length - this.counter }}/{{ this.$store.getters.MARKED_USERS.length }}
+            <div v-show="!loadingProfile">
+              <div v-if="isEmptyToken">
+                Пройдите авторизацию
+              </div>
+              <div v-else>
+                <div v-show="!this.$store.getters.BROKENBUILD">
+                  <div v-show="!addedMoreThanOneUser">
+                    Добавьте хотя бы 2 пользователей
+                  </div>
+                  <div v-show="addedMoreThanOneUser && !canStartBuild">
+                    Выберите более 1 пользователя
+                  </div>
+                  <div v-show="!loadingFriends && canStartBuild && !this.$store.getters.BUILDCOMPLETED">
+                    Запустите постройку
+                  </div>
+                  <div v-show="!loadingFriends && canStartBuild && this.$store.getters.BUILDCOMPLETED">
+                    Общие друзья не найдены
+                  </div>
+                  <div v-show="loadingFriends">
+                    Загрузка...
+                    <br/>
+                    {{ this.$store.getters.MARKED_USERS.length - this.counter }}/{{ this.$store.getters.MARKED_USERS.length }}
+                  </div>
                 </div>
               </div>
               <div v-show="this.$store.getters.BROKENBUILD">
@@ -87,7 +95,9 @@ export default {
       href: 'https://oauth.vk.com/authorize?client_id=51455801&display=page&redirect_uri=' + location.origin + '&scope=friends&response_type=token&v=5.131',
       desiredId: undefined,
       counter: this.$store.getters.MARKED_USERS.length,
-      friends: []
+      friends: [],
+      loadingFriends: false,
+      loadingProfile: false
     }
   },
   methods: {
@@ -112,6 +122,7 @@ export default {
       this.$refs.focusInput.focus()
     },
     getAccountInfo () {
+      this.loadingProfile = true
       jsonp('https://api.vk.com/method/users.get',
         {
           access_token: this.$store.getters.TOKEN,
@@ -127,9 +138,11 @@ export default {
               photo_url: res.response[0].photo_50
             }
           )
+          this.loadingProfile = false
         })
         .catch(error => {
           this.processBasicErrors(error, 'Ошибка при авторизации')
+          this.loadingProfile = false
         })
     },
     addById () {
@@ -165,6 +178,7 @@ export default {
     },
     build () {
       this.$store.dispatch('startBuild')
+      this.loadingFriends = true
       this.friends = []
       this.counter = this.$store.getters.MARKED_USERS.length
       this.counter = this.$store.getters.MARKED_USERS.length
@@ -208,11 +222,13 @@ export default {
             this.counter--
             if (this.counter === 0) {
               this.$store.dispatch('finishBuild', this.processFriends(this.friends))
+              this.loadingFriends = false
             }
           }
           )
           .catch(error => {
             this.$store.dispatch('breakBuild')
+            this.loadingFriends = false
             this.processBasicErrors(error, 'Ошибка при построении списка друзей')
           }), delay)
     },
@@ -274,6 +290,12 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   padding-right: 4px;
+}
+.preloader {
+  height: 45px;
+}
+.managePanel__other-container .preloader {
+  height: 29px;
 }
 .ps {
   margin-top: 42px;
