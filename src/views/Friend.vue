@@ -32,7 +32,7 @@
     <br/>
       <template v-if="this.private">Стена скрыта</template>
       <template v-else-if="this.banned">Пользовател заблокирован, стена недоступна</template>
-      <template v-else-if="this.IS_EMPTY_TOKEN">Необходимо произвести вход</template>
+      <template v-else-if="IS_EMPTY_TOKEN">Необходимо произвести вход</template>
       <template v-else>
         Последние 20 постов пользователя:
         <div class="posts-wrap">

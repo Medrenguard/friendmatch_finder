@@ -33,7 +33,7 @@
             :key="user.id"/>
         </div>
         <div class="friendList">
-          <div class="info" v-show="!this.friendsPull.length">
+          <div class="info" v-show="!friendsPull.length">
             <div v-show="loadingProfile">
               <img class="preloader" src="../assets/loading.svg">
             </div>
@@ -42,33 +42,33 @@
                 Пройдите авторизацию
               </div>
               <div v-else>
-                <div v-show="!this.brokenBuild">
+                <div v-show="!brokenBuild">
                   <div v-show="!addedMoreThanOneUser">
                     Добавьте хотя бы 2 пользователей
                   </div>
                   <div v-show="addedMoreThanOneUser && !canStartBuild">
                     Выберите более 1 пользователя
                   </div>
-                  <div v-show="!loadingFriends && canStartBuild && !this.buildCompleted">
+                  <div v-show="!loadingFriends && canStartBuild && !buildCompleted">
                     Запустите постройку
                   </div>
-                  <div v-show="!loadingFriends && canStartBuild && this.buildCompleted">
+                  <div v-show="!loadingFriends && canStartBuild && buildCompleted">
                     Общие друзья не найдены
                   </div>
                   <div v-show="loadingFriends">
                     Загрузка...
                     <br/>
-                    {{ this.MARKED_USERS_COUNT - this.counter }}/{{ this.MARKED_USERS_COUNT }}
+                    {{ MARKED_USERS_COUNT - counter }}/{{ MARKED_USERS_COUNT }}
                   </div>
                 </div>
               </div>
-              <div v-show="this.brokenBuild">
+              <div v-show="brokenBuild">
                 Произошла ошибка при построении. Пожалуйста, попробуйте снова
               </div>
             </div>
           </div>
           <friend-card
-            v-for="friend in this.friendsPull"
+            v-for="friend in friendsPull"
             :id="friend.id"
             :fullname="friend.fullname"
             :photo_url="friend.photo_url"
@@ -224,8 +224,7 @@ export default {
               this.$store.dispatch('finishBuild', this.processFriends(this.friends))
               this.loadingFriends = false
             }
-          }
-          )
+          })
           .catch(error => {
             this.$store.dispatch('breakBuild')
             this.loadingFriends = false
