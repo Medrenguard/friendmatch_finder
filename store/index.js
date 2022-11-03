@@ -5,12 +5,12 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    currentUser: { 'photo_url': undefined },
     currentView: 'Home',
     currentFriendId: undefined,
     users: [],
     friendsPull: [],
     markedUsers: [],
-    loading: false,
     buildCompleted: false,
     brokenBuild: false,
     access_token: undefined
@@ -26,6 +26,9 @@ export const store = new Vuex.Store({
   mutations: {
     injectToken (state, newValue) {
       state.access_token = newValue
+    },
+    injectUser (state, newValue) {
+      state.currentUser = newValue
     },
     clearToken (state) {
       state.access_token = undefined
@@ -59,9 +62,6 @@ export const store = new Vuex.Store({
     },
     changeFriendId (state, newId) {
       state.currentFriendId = newId
-    },
-    changeLoading (state, newValue) {
-      state.loading = newValue
     }
   },
   actions: {
@@ -82,16 +82,13 @@ export const store = new Vuex.Store({
       context.commit('clearFriendsPull')
       context.commit('changeBuildBroken', false)
       context.commit('changeBuildCompleted', false)
-      context.commit('changeLoading', true)
     },
     finishBuild (context, newValue) {
       context.commit('updateFriendsPull', newValue)
       context.commit('changeBuildCompleted', true)
-      context.commit('changeLoading', false)
     },
     breakBuild (context) {
       context.commit('changeBuildBroken', true)
-      context.commit('changeLoading', false)
     }
   }
 })

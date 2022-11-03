@@ -4,11 +4,19 @@
       <input ref="focusInput" type="text" v-model="desiredId" placeholder="Введите ID"/>
       <button @click="addById" :disabled="IS_EMPTY_TOKEN">Найти</button>
       <button @click="build" :disabled="!canStartBuild || IS_EMPTY_TOKEN">Построить</button>
-      <template v-if="IS_EMPTY_TOKEN">
-        <a :href="href">
-          Войти
-        </a>
-      </template>
+      <div class="managePanel__other-container">
+        <img v-show="loadingProfile" class="preloader" src="../assets/loading.svg">
+        <div v-show="!loadingProfile" style="display: inherit">
+          <template v-if="IS_EMPTY_TOKEN">
+            <a :href="href">
+              Войти
+            </a>
+          </template>
+          <template v-else>
+            <img class="avatar" :src="currentUser.photo_url">
+          </template>
+        </div>
+      </div>
     </div>
     <perfect-scrollbar>
       <div class="column-two">
@@ -26,27 +34,32 @@
         </div>
         <div class="friendList">
           <div class="info" v-show="!this.friendsPull.length">
-            <div v-if="IS_EMPTY_TOKEN">
-              Пройдите авторизацию
+            <div v-show="loadingProfile">
+              <img class="preloader" src="../assets/loading.svg">
             </div>
-            <div v-else>
-              <div v-show="!this.brokenBuild">
-                <div v-show="!addedMoreThanOneUser">
-                  Добавьте хотя бы 2 пользователей
-                </div>
-                <div v-show="addedMoreThanOneUser && !canStartBuild">
-                  Выберите более 1 пользователя
-                </div>
-                <div v-show="!this.loading && canStartBuild && !this.buildCompleted">
-                  Запустите постройку
-                </div>
-                <div v-show="!this.loading && canStartBuild && this.buildCompleted">
-                  Общие друзья не найдены
-                </div>
-                <div v-show="this.loading">
-                  Загрузка...
-                  <br/>
-                  {{ this.MARKED_USERS_COUNT - this.counter }}/{{ this.MARKED_USERS_COUNT }}
+            <div v-show="!loadingProfile">
+              <div v-if="IS_EMPTY_TOKEN">
+                Пройдите авторизацию
+              </div>
+              <div v-else>
+                <div v-show="!this.brokenBuild">
+                  <div v-show="!addedMoreThanOneUser">
+                    Добавьте хотя бы 2 пользователей
+                  </div>
+                  <div v-show="addedMoreThanOneUser && !canStartBuild">
+                    Выберите более 1 пользователя
+                  </div>
+                  <div v-show="!loadingFriends && canStartBuild && !this.buildCompleted">
+                    Запустите постройку
+                  </div>
+                  <div v-show="!loadingFriends && canStartBuild && this.buildCompleted">
+                    Общие друзья не найдены
+                  </div>
+                  <div v-show="loadingFriends">
+                    Загрузка...
+                    <br/>
+                    {{ this.MARKED_USERS_COUNT - this.counter }}/{{ this.MARKED_USERS_COUNT }}
+                  </div>
                 </div>
               </div>
               <div v-show="this.brokenBuild">
@@ -83,7 +96,9 @@ export default {
       href: 'https://oauth.vk.com/authorize?client_id=51455801&display=page&redirect_uri=' + location.origin + '&scope=friends&response_type=token&v=5.131',
       desiredId: undefined,
       counter: this.MARKED_USERS_COUNT,
-      friends: []
+      friends: [],
+      loadingFriends: false,
+      loadingProfile: false
     }
   },
   methods: {
@@ -106,6 +121,30 @@ export default {
     },
     focusOnInput () {
       this.$refs.focusInput.focus()
+    },
+    getAccountInfo () {
+      this.loadingProfile = true
+      jsonp('https://api.vk.com/method/users.get',
+        {
+          access_token: this.access_token,
+          v: '5.131',
+          fields: 'photo_50'
+        })
+        .then(res => {
+          if ('error' in res) { throw (res.error) }
+          this.$store.commit('injectUser',
+            {
+              // id: res.response[0].id,
+              // name: res.response[0].first_name,
+              photo_url: res.response[0].photo_50
+            }
+          )
+          this.loadingProfile = false
+        })
+        .catch(error => {
+          this.processBasicErrors(error, 'Ошибка при авторизации')
+          this.loadingProfile = false
+        })
     },
     addById () {
       this.focusOnInput()
@@ -140,6 +179,7 @@ export default {
     },
     build () {
       this.$store.dispatch('startBuild')
+      this.loadingFriends = true
       this.friends = []
       this.counter = this.MARKED_USERS_COUNT
       this.markedUsers.forEach((user, i) => {
@@ -182,11 +222,13 @@ export default {
             this.counter--
             if (this.counter === 0) {
               this.$store.dispatch('finishBuild', this.processFriends(this.friends))
+              this.loadingFriends = false
             }
           }
           )
           .catch(error => {
             this.$store.dispatch('breakBuild')
+            this.loadingFriends = false
             this.processBasicErrors(error, 'Ошибка при построении списка друзей')
           }), delay)
     },
@@ -201,6 +243,7 @@ export default {
 
   computed: {
     ...mapState([
+      'currentUser',
       'users',
       'markedUsers',
       'friendsPull',
@@ -229,6 +272,7 @@ export default {
   },
   mounted () {
     if (this.injectToken() === 'success') {
+      this.getAccountInfo()
       this.focusOnInput()
     }
   }
@@ -238,12 +282,31 @@ export default {
 <style scoped>
 .managePanel{
   position: fixed;
-  width: 100%;
+  width: calc(100% + 2px);
+  height: 43px;
+  box-sizing: border-box;
   border: 1px solid;
-  padding: 10px;
+  padding: 0 6px;
   background: white;
-  margin-top: -42px;
+  margin: -42px -1px 0;
   z-index: 1;
+  display: flex;
+}
+.managePanel > :nth-child(n) {
+  margin-left: 4px;
+  align-self: center;
+}
+.managePanel__other-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row-reverse;
+  padding-right: 4px;
+}
+.preloader {
+  height: 45px;
+}
+.managePanel__other-container .preloader {
+  height: 29px;
 }
 .ps {
   margin-top: 42px;
@@ -264,6 +327,11 @@ export default {
   font-weight: 700;
   font-size: 18px;
   text-align: center;
+}
+.avatar {
+  height: 29px;
+  border-radius: 15px;
+  margin: 0 2px;
 }
 @media screen and (max-width: 480px) {
   .info {
