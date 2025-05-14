@@ -4,7 +4,7 @@
 
 ![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D)
 
-![Version](https://img.shields.io/github/v/release/Medrenguard/vk-vue)
+![Version](https://img.shields.io/github/v/release/Medrenguard/friendmatch_finder)
 
 Friendmatch Finder - это сервис поиска общих друзей VK между 2 и более пользователями.
 
