@@ -1,4 +1,4 @@
-# [Friendmatch Finder](https://py.medrenguard.space/)
+# [Friendmatch Finder](https://medrenguard.github.io/friendmatch_finder/)
 
 ## _Найти общих друзей между твоими друзьями VK? Легко._
 
