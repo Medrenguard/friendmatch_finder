@@ -93,7 +93,7 @@ export default {
   mixins: [postRequestFunctionsMixin],
   data () {
     return {
-      href: 'https://oauth.vk.com/authorize?client_id=51455801&display=page&redirect_uri=' + location.origin + '&scope=friends&response_type=token&v=5.131',
+      href: 'https://oauth.vk.com/authorize?client_id=51455801&display=page&redirect_uri=' + location.origin + location.pathname + '&scope=friends&response_type=token&v=5.131',
       desiredId: undefined,
       counter: this.MARKED_USERS_COUNT,
       friends: [],
