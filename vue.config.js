@@ -1,5 +1,9 @@
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/friendmatch_finder/'
-    : '/'
-}
+  publicPath: '/friendmatch_finder/',
+  chainWebpack: (config) => {
+    config.plugin('html').tap((args) => {
+      args[0].base = '/friendmatch_finder/';
+      return args;
+    });
+  }
+};
